@@ -1,5 +1,9 @@
 <?php
 include 'config/db.php';
+include 'config/auth.php';
+checkLogin();
+$user = current_user();
+allowRole(['admin']);
 
 $sql = "SELECT l.*, j.nama_lengkap AS jukir_utama 
         FROM lokasi l 
@@ -19,23 +23,26 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 <body style="display: flex; margin: 0; background: #f8fafc;">
 
-    <?php include 'components/sidebar.php'; ?>
+    <?php include 'components/navbar.php'; ?>
 
-    <div class="main-content">
+    <div class="app-body">
 
-        <?php include 'components/navbar.php'; ?>
+        <?php include 'components/sidebar.php'; ?>
 
-        <div class="container">
-            <div style="margin-bottom: 1.5rem;">
-                <h1 style="font-size: 1.5rem; color: var(--sidebar-bg);">Peta Lokasi Parkir</h1>
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Klik pada marker untuk melihat detail retribusi
-                    cepat.</p>
+        <main class="main-content">
+            <div class="container">
+                <div style="margin-bottom: 1.5rem;">
+                    <h1 style="font-size: 1.5rem; color: var(--sidebar-bg);">Peta Lokasi Parkir</h1>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Klik pada marker untuk melihat detail
+                        retribusi
+                        cepat.</p>
+                </div>
+
+                <div id="map-wrapper">
+                    <div id="map"></div>
+                </div>
             </div>
-
-            <div id="map-wrapper">
-                <div id="map"></div>
-            </div>
-        </div>
+        </main>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
