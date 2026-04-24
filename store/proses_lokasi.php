@@ -2,8 +2,6 @@
 include '../config/db.php';
 
 $action = $_GET['action'] ?? '';
-
-// LOGIKA TAMBAH DAN EDIT DATA
 if ($action == 'add' || $action == 'edit') {
     $id = $_POST['id'] ?? null;
     $kode_qris = mysqli_real_escape_string($conn, $_POST['kode_qris']);
