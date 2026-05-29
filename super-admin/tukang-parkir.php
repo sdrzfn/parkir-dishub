@@ -5,27 +5,64 @@ checkLogin();
 $user = current_user();
 allowRole(['super-admin']);
 
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$kecamatan = isset($_GET['kecamatan']) ? trim($_GET['kecamatan']) : '';
+$titik_parkir = isset($_GET['titik_parkir']) ? trim($_GET['titik_parkir']) : '';
+$status_aktif = isset($_GET['status_aktif']);
+$status_nonaktif = isset($_GET['status_nonaktif']);
+$where = "WHERE 1=1";
+
+if ($search !== '') {
+    $s = mysqli_real_escape_string($conn, $search);
+    $where .= " AND (jukir_utama.nama_lengkap LIKE '%$s%' 
+                  OR jukir_utama.nik LIKE '%$s%'
+                  OR lokasi.nama_lokasi LIKE '%$s%'
+                  OR lokasi.kode_qris LIKE '%$s%')";
+}
+
+if ($kecamatan !== '') {
+    $k = mysqli_real_escape_string($conn, $kecamatan);
+    $where .= " AND koordinator_wilayah.wilayah = '$k'";
+}
+
+if ($titik_parkir !== '') {
+    $tp = mysqli_real_escape_string($conn, $titik_parkir);
+    $where .= " AND lokasi.titik_parkir = '$tp'";
+}
+if ($status_aktif && !$status_nonaktif) {
+    $where .= " AND jukir_utama.status_peringatan = 'aktif'";
+} elseif (!$status_aktif && $status_nonaktif) {
+    $where .= " AND jukir_utama.status_peringatan != 'aktif'";
+}
+
+$count_sql = "SELECT COUNT(*) AS total 
+              FROM jukir_utama
+              INNER JOIN lokasi ON jukir_utama.id_lokasi = lokasi.id
+              LEFT JOIN koordinator_wilayah ON jukir_utama.id_korwil = koordinator_wilayah.id
+              $where";
+$total_result = mysqli_query($conn, $count_sql);
+$total_row = mysqli_fetch_assoc($total_result)['total'];
 $limit = 25;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
-
-$total_result = mysqli_query($conn, "SELECT COUNT(*) AS total FROM jukir_utama");
-$total_row = mysqli_fetch_assoc($total_result)['total'];
 $total_pages = ceil($total_row / $limit);
 
-// Query Jukir Utama
-$sql = "SELECT 
+$sql = "SELECT
             jukir_utama.*, 
             lokasi.nama_lokasi, 
-            lokasi.kode_qris 
+            lokasi.kode_qris,
+            lokasi.titik_parkir,
+            koordinator_wilayah.wilayah AS kecamatan
         FROM jukir_utama
         INNER JOIN lokasi ON jukir_utama.id_lokasi = lokasi.id
+        LEFT JOIN koordinator_wilayah ON jukir_utama.id_korwil = koordinator_wilayah.id
+        $where
         ORDER BY jukir_utama.id DESC
         LIMIT $offset, $limit";
 
 $result = mysqli_query($conn, $sql);
-
 $list_lokasi = mysqli_query($conn, "SELECT id, nama_lokasi, kode_qris FROM lokasi ORDER BY nama_lokasi ASC");
+$list_wilayah = mysqli_query($conn, "SELECT DISTINCT wilayah FROM koordinator_wilayah ORDER BY wilayah ASC");
 ?>
 
 <!DOCTYPE html>
@@ -43,6 +80,7 @@ $list_lokasi = mysqli_query($conn, "SELECT id, nama_lokasi, kode_qris FROM lokas
 
         <main class="main-content">
             <div class="container">
+                <?php include '../components/breadcrumb.php'; ?>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <div>
                         <h1 style="font-size: 1.8rem; color: var(--sidebar-bg); margin: 0;">Daftar Juru Parkir</h1>
@@ -51,6 +89,66 @@ $list_lokasi = mysqli_query($conn, "SELECT id, nama_lokasi, kode_qris FROM lokas
                     </div>
                     <button class="btn-primary" onclick="openAddModal()">+ Tambah Jukir</button>
                 </div>
+
+                <form method="GET" action="">
+                    <div class="filter-container">
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <div style="flex: 1; position: relative;">
+                                <input type="text" name="search" id="search" value="<?= htmlspecialchars($search) ?>"
+                                    placeholder="Cari Kode Lokasi atau Nama Jalan..."
+                                    style="width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid #cbd5e1; ...">
+                            </div>
+                            <button type="submit"
+                                style="padding: 0 25px; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                                Cari Data
+                            </button>
+                        </div>
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <div>
+                                <label for="filter-titik">Kecamatan</label>
+                                <select name="kecamatan" class="filter-select">
+                                    <option value="">Semua Kecamatan</option>
+                                    <option value="sidoarjo" <?= $kecamatan == 'sidoarjo' ? 'selected' : '' ?>>Sidoarjo
+                                        Kota</option>
+                                    <option value="waru" <?= $kecamatan == 'waru' ? 'selected' : '' ?>>Waru</option>
+                                    <option value="taman" <?= $kecamatan == 'taman' ? 'selected' : '' ?>>Taman</option>
+                                    <option value="krian" <?= $kecamatan == 'krian' ? 'selected' : '' ?>>Krian</option>
+                                    <option value="gedangan" <?= $kecamatan == 'gedangan' ? 'selected' : '' ?>>Gedangan
+                                    </option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="filter-titik">Titik Parkir</label>
+                                <select name="titik_parkir" id="filter-titik" class="filter-select">
+                                    <option value="">Semua Titik</option>
+                                    <option value="TJU" <?= $titik_parkir == 'TJU' ? 'selected' : '' ?>>TJU</option>
+                                    <option value="TKP" <?= $titik_parkir == 'TKP' ? 'selected' : '' ?>>TKP</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="...">Status</label>
+                                <div style="display: flex; gap: 10px; align-items: center; height: 40px;">
+                                    <label style="...">
+                                        <input type="checkbox" name="status_aktif" <?= $status_aktif ? 'checked' : '' ?>>
+                                        Aktif
+                                    </label>
+                                    <label style="...">
+                                        <input type="checkbox" name="status_nonaktif" <?= $status_nonaktif ? 'checked' : '' ?>> Non-Aktif
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div style="margin-top: 15px; text-align: right;">
+                            <a href="tukang-parkir.php"
+                                style="background: none; border: none; color: #ef4444; font-size: 0.85rem; font-weight: 500; cursor: pointer; text-decoration: underline;">
+                                Reset Filter
+                            </a>
+                        </div>
+                    </div>
+                </form>
 
                 <div class="table-container">
                     <table>
@@ -118,7 +216,21 @@ $list_lokasi = mysqli_query($conn, "SELECT id, nama_lokasi, kode_qris FROM lokas
                         </tbody>
                     </table>
                 </div>
-                <div class="pagination"></div>
+                <div class="pagination">
+                    <?php
+                    $query_params = http_build_query([
+                        'search' => $search,
+                        'kecamatan' => $kecamatan,
+                        'titik_parkir' => $titik_parkir,
+                        'status_aktif' => $status_aktif ? '1' : '',
+                        'status_nonaktif' => $status_nonaktif ? '1' : '',
+                    ]);
+                    for ($i = 1; $i <= $total_pages; $i++): ?>
+                        <a href="?page=<?= $i ?>&<?= $query_params ?>" class="<?= ($page == $i) ? 'active' : '' ?>">
+                            <?= $i ?>
+                        </a>
+                    <?php endfor; ?>
+                </div>
             </div>
         </main>
     </div>
@@ -130,7 +242,7 @@ $list_lokasi = mysqli_query($conn, "SELECT id, nama_lokasi, kode_qris FROM lokas
                 <span style="cursor:pointer; font-size: 24px;" onclick="closeModal()">&times;</span>
             </div>
 
-            <form action="store/proses_jukir.php?action=add" method="POST">
+            <form action="../store/proses_jukir.php?action=add" method="POST">
                 <input type="hidden" name="id" id="form_id">
 
                 <div class="form-group">
@@ -188,7 +300,7 @@ $list_lokasi = mysqli_query($conn, "SELECT id, nama_lokasi, kode_qris FROM lokas
 
         function openAddModal() {
             document.getElementById('modalTitle').innerText = "Tambah Juru Parkir Baru";
-            form.action = "store/proses_jukir.php?action=add";
+            form.action = "../store/proses_jukir.php?action=add";
             form.reset();
             document.getElementById('form_id').value = "";
 
@@ -198,7 +310,7 @@ $list_lokasi = mysqli_query($conn, "SELECT id, nama_lokasi, kode_qris FROM lokas
 
         function openEditModal(data) {
             document.getElementById('modalTitle').innerText = "Edit Data Juru Parkir";
-            form.action = "store/proses_jukir.php?action=edit";
+            form.action = "../store/proses_jukir.php?action=edit";
 
             document.getElementById('form_id').value = data.id;
             document.getElementById('form_nik').value = data.nik;
