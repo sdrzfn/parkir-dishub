@@ -22,9 +22,9 @@ while ($t = mysqli_fetch_assoc($q_tren)) {
 
 $ind = getIndicator($summary['persentase']);
 
-$q_map = "SELECT l.*, j.nama_lengkap AS jukir_utama 
-        FROM lokasi l 
-        LEFT JOIN jukir_utama j ON l.id = j.id_lokasi 
+$q_map = "SELECT l.*, j.nama_lengkap AS jukir_utama, l.nama_lokasi AS nama
+        FROM lokasi l
+        LEFT JOIN jukir_utama j ON l.id = j.id_lokasi
         WHERE l.latitude IS NOT NULL AND l.longitude IS NOT NULL";
 $result = mysqli_query($conn, $q_map);
 $lokasi_data = [];
@@ -155,10 +155,8 @@ if (empty($kecamatan_labels)) {
                     <div
                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                         <div>
-                            <h4 style="margin: 0; color: #1e293b; font-weight: 700; font-size: 1.2rem;">Sebaran Titik
-                                Parkir</h4>
-                            <p style="font-size: 13px; color: #64748b; margin-top: 4px;">Wilayah Operasional Kabupaten
-                                Sidoarjo</p>
+                            <h4 style="margin: 0; color: #1e293b; font-weight: 700; font-size: 1.2rem;">Sebaran Titik Parkir</h4>
+                            <p style="font-size: 13px; color: #64748b; margin-top: 4px;">Wilayah Operasional Kabupaten Sidoarjo</p>
                         </div>
                         <a href="peta.php"
                             style="background: #3b82f6; color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.15); display: flex; align-items: center; gap: 8px;">
