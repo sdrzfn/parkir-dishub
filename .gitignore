@@ -1,2 +1,4 @@
 # Ignore fontawesome dir
 fontawesome/
+
+/vendor/
