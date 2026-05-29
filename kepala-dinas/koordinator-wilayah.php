@@ -50,7 +50,7 @@ $result = mysqli_query($conn, $sql);
                                     <td style="text-align: center;">
                                         <a href="detail-korwil.php?id=<?= $row['id']; ?>" class="btn-primary"
                                             style="text-decoration: none; padding: 5px 15px; font-size: 0.8rem;">
-                                            Lihat Detail & Jukir
+                                            Detail
                                         </a>
                                     </td>
                                 </tr>
