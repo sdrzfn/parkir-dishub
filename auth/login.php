@@ -21,6 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
                 $redirect_url = '../super-admin/index.php';
             } elseif ($user['role'] === 'kepala-dinas') {
                 $redirect_url = '../kepala-dinas/index.php';
+            } elseif ($user['role'] === 'bendahara') {
+                $redirect_url = '../bendahara/index.php';
             }
 
             echo json_encode([
