@@ -23,6 +23,7 @@ $user = mysqli_fetch_assoc($query);
 
         <main class="main-content">
             <div class="container" style="max-width: 900px; margin: 0 auto;">
+                <?php include '../components/breadcrumb.php'; ?>
                 
                 <div style="margin-bottom: 2rem;">
                     <h1 style="font-size: 1.5rem; font-weight: 700; color: #1d3967;">Pengaturan Profil</h1>
