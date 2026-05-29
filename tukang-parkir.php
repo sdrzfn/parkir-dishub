@@ -80,6 +80,7 @@ $list_wilayah = mysqli_query($conn, "SELECT DISTINCT wilayah FROM koordinator_wi
 
         <main class="main-content">
             <div class="container">
+                <?php include 'components/breadcrumb.php'; ?>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <div>
                         <h1 style="font-size: 1.8rem; color: var(--sidebar-bg); margin: 0;">Daftar Juru Parkir</h1>
@@ -104,17 +105,17 @@ $list_wilayah = mysqli_query($conn, "SELECT DISTINCT wilayah FROM koordinator_wi
                         </div>
                         <div
                             style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                            <div>
-                                <label style="...">Kecamatan</label>
-                                <select name="kecamatan" style="...">
-                                    <option value="">Semua Kecamatan</option>
-                                    <option value="sidoarjo" <?= $kecamatan == 'sidoarjo' ? 'selected' : '' ?>>Sidoarjo
-                                        Kota</option>
-                                    <option value="waru" <?= $kecamatan == 'waru' ? 'selected' : '' ?>>Waru</option>
-                                    <option value="taman" <?= $kecamatan == 'taman' ? 'selected' : '' ?>>Taman</option>
-                                    <option value="krian" <?= $kecamatan == 'krian' ? 'selected' : '' ?>>Krian</option>
-                                    <option value="gedangan" <?= $kecamatan == 'gedangan' ? 'selected' : '' ?>>Gedangan
-                                    </option>
+                            <div class="filter-field">
+                                <label for="filter-wilayah">Kecamatan</label>
+                                <select name="kecamatan" class="filter-select">
+                                    <option value="">Semua Wilayah</option>
+                                    <option value="Sidoarjo 1" <?= $kecamatan == 'Sidoarjo 1' ? 'selected' : '' ?>>Sidoarjo
+                                        1</option>
+                                    <option value="Sidoarjo 2" <?= $kecamatan == 'Sidoarjo 2' ? 'selected' : '' ?>>Sidoarjo
+                                        2</option>
+                                    <option value="Waru" <?= $kecamatan == 'Waru' ? 'selected' : '' ?>>Waru</option>
+                                    <option value="Porong" <?= $kecamatan == 'Porong' ? 'selected' : '' ?>>Porong</option>
+                                    <option value="Krian" <?= $kecamatan == 'Krian' ? 'selected' : '' ?>>Krian</option>
                                 </select>
                             </div>
                             <div>
@@ -125,7 +126,7 @@ $list_wilayah = mysqli_query($conn, "SELECT DISTINCT wilayah FROM koordinator_wi
                                     <option value="TKP" <?= $titik_parkir == 'TKP' ? 'selected' : '' ?>>TKP</option>
                                 </select>
                             </div>
-                            <div>
+                            <!-- <div>
                                 <label style="...">Status</label>
                                 <div style="display: flex; gap: 10px; align-items: center; height: 40px;">
                                     <label style="...">
@@ -136,7 +137,7 @@ $list_wilayah = mysqli_query($conn, "SELECT DISTINCT wilayah FROM koordinator_wi
                                         <input type="checkbox" name="status_nonaktif" <?= $status_nonaktif ? 'checked' : '' ?>> Non-Aktif
                                     </label>
                                 </div>
-                            </div>
+                            </div> -->
 
                         </div>
 
