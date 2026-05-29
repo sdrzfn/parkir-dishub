@@ -35,9 +35,7 @@ $res_pembantu = mysqli_query($conn, $sql_pembantu);
 
         <main class="main-content">
             <div class="container">
-                <a href="koordinator-wilayah.php"
-                    style="text-decoration: none; color: var(--primary); font-size: 0.9rem;">← Kembali ke Daftar</a>
-
+                <?php include 'components/breadcrumb.php'; ?>
                 <div
                     style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 5px solid var(--primary);">
                     <h2 style="margin: 0;"><?= $korwil['wilayah']; ?></h2>
