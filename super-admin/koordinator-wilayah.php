@@ -22,6 +22,7 @@ $result = mysqli_query($conn, $sql);
 
         <main class="main-content">
             <div class="container">
+                <?php include '../components/breadcrumb.php'; ?>
                 <div style="margin-bottom: 2rem;">
                     <h1 style="font-size: 1.8rem; color: var(--sidebar-bg); margin: 0;">Manajemen Koordinator Wilayah
                     </h1>
@@ -50,7 +51,7 @@ $result = mysqli_query($conn, $sql);
                                     <td style="text-align: center;">
                                         <a href="detail-korwil.php?id=<?= $row['id']; ?>" class="btn-primary"
                                             style="text-decoration: none; padding: 5px 15px; font-size: 0.8rem;">
-                                            Lihat Detail & Jukir
+                                            Detail
                                         </a>
                                     </td>
                                 </tr>
