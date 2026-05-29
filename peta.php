@@ -31,6 +31,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         <main class="main-content">
             <div class="container">
+                <?php include 'components/breadcrumb.php'; ?>
                 <div style="margin-bottom: 1.5rem;">
                     <h1 style="font-size: 1.5rem; color: var(--sidebar-bg);">Peta Lokasi Parkir</h1>
                     <p style="color: var(--text-muted); font-size: 0.9rem;">Klik pada marker untuk melihat detail
