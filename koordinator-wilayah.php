@@ -23,10 +23,9 @@ $result = mysqli_query($conn, $sql);
         <main class="main-content">
             <div class="container">
                 <?php include 'components/breadcrumb.php'; ?>
-                <div style="margin-bottom: 2rem;">
-                    <h1 style="font-size: 1.8rem; color: var(--sidebar-bg); margin: 0;">Manajemen Koordinator Wilayah
-                    </h1>
-                    <p style="color: var(--text-muted); margin-top: 5px;">Daftar penanggung jawab wilayah Sidoarjo</p>
+                <div class="page-header">
+                    <h1 class="page-title">Manajemen Koordinator Wilayah</h1>
+                    <p class="page-subtitle">Daftar penanggung jawab wilayah Sidoarjo</p>
                 </div>
 
                 <div class="table-container">

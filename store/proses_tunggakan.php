@@ -1,6 +1,7 @@
 <?php
 include '../config/db.php';
 include '../config/auth.php';
+include '../config/helper.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $id_jukir = mysqli_real_escape_string($conn, $_POST['id_jukir']);
@@ -78,7 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 window.location.href = '../retribusi-detail.php?id=$id_jukir&status=success';
             </script>";
         } else {
-            header("Location: ../retribusi-detail.php?id=$id_jukir&status=success");
+            // header("Location: ../retribusi-detail.php?id=$id_jukir&status=success");
+            redirectBack('retribusi-detail.php', ['id' => $id_jukir, 'status' => "success"]);
         }
     }
 }

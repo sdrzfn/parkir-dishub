@@ -147,6 +147,7 @@ $total_bendahara = mysqli_query($conn, "SELECT COUNT(*) as total FROM users WHER
                             class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white">
                             <option value="admin">Admin</option>
                             <option value="kepala-dinas">Kepala Dishub</option>
+                            <option value="bendahara">Bendahara</option>
                         </select>
                     </div>
                 </div>
@@ -191,7 +192,7 @@ $total_bendahara = mysqli_query($conn, "SELECT COUNT(*) as total FROM users WHER
             document.getElementById('modalTitle').innerText = "Edit Data User";
             document.getElementById('form_action').value = "edit";
             document.getElementById('form_id').value = data.id;
-            document.getElementById('form_nama').value = data.nama_lengkap;
+            document.getElementById('form_nama').value = data.nama;
             document.getElementById('form_username').value = data.username;
             // document.getElementById('form_email').value = data.email;
             document.getElementById('form_role').value = data.role;

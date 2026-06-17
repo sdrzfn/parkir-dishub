@@ -2,43 +2,11 @@
 include '../config/db.php';
 include '../config/auth.php';
 include '../config/retribusi.php';
+include '../api/fetch_retribusi.php';
 
 checkLogin();
 $user = current_user();
 allowRole(['bendahara']);
-
-$limit = 25;
-$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-$offset = ($page - 1) * $limit;
-
-$total_result = mysqli_query($conn, "SELECT COUNT(*) AS total FROM jukir_utama");
-$total_row = mysqli_fetch_assoc($total_result)['total'];
-$total_pages = ceil($total_row / $limit);
-
-$bulan_ini = date('m');
-$tahun_ini = date('Y');
-
-$sql = "SELECT 
-            ju.id,
-            ju.nama_lengkap AS nama_utama,
-            (SELECT GROUP_CONCAT(nama_pembantu SEPARATOR ', ') 
-            FROM jukir_pembantu 
-            WHERE id_utama = ju.id) AS nama_pembantu,
-            l.nama_lokasi AS lokasi,
-            ju.target_bulanan AS target,
-            IFNULL(SUM(tr.jumlah_setoran), 0) AS realisasi
-        FROM jukir_utama ju
-        LEFT JOIN lokasi l ON ju.id_lokasi = l.id
-        LEFT JOIN transaksi_retribusi tr ON ju.id = tr.id_jukir 
-            AND MONTH(tr.tanggal_setoran) = MONTH(CURRENT_DATE())
-            AND YEAR(tr.tanggal_setoran) = YEAR(CURRENT_DATE())
-        GROUP BY ju.id, l.nama_lokasi
-        LIMIT $offset, $limit";
-
-$result = mysqli_query($conn, $sql);
-$list_lokasi = mysqli_query($conn, "SELECT id, nama_lokasi, kode_qris FROM lokasi ORDER BY nama_lokasi ASC");
-
-$q_percentage = "";
 
 function hitungPersentase($realisasi, $target)
 {
@@ -67,12 +35,9 @@ function hitungPersentase($realisasi, $target)
             <div class="container">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <div>
-                        <h1 style="font-size: 1.8rem; color: var(--sidebar-bg); margin: 0;">Daftar Retribusi Juru Parkir
-                        </h1>
-                        <p style="color: var(--text-muted); margin-top: 5px;">Manajemen Retribusi Juru Parkir
-                        </p>
+                        <h1 class="page-title">Daftar Retribusi Petugas Parkir</h1>
+                        <p class="page-subtitle">Manajemen Retribusi Petugas Parkir</p>
                     </div>
-                    <!-- <button class="btn-primary" onclick="openAddModal()">+ Tambah Jukir</button> -->
                 </div>
 
                 <div class="table-container">
@@ -85,6 +50,8 @@ function hitungPersentase($realisasi, $target)
                                 <th class="py-3 px-6">Realisasi</th>
                                 <th class="py-3 px-6">Target</th>
                                 <th class="py-3 px-6">Persentase</th>
+                                <th class="py-3 px-6">Denda (2%)</th>
+                                <th class="py-3 px-6">Imbal Jasa (40%)</th>
                                 <th class="py-3 px-6 text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -101,6 +68,12 @@ function hitungPersentase($realisasi, $target)
                                 $jumlah_pembantu = count($pembantu_list);
 
                                 $persen = hitungPersentase($row['realisasi'], $row['target']);
+                                $target_dana = $row['target'];
+                                $realisasi_dana = $row['realisasi'];
+
+                                $tunggakan = ($target_dana > $realisasi_dana) ? ($target_dana - $realisasi_dana) : 0;
+                                $denda = $tunggakan * 0.02;
+                                $imbal_jasa = $realisasi_dana * 0.40;
                                 ?>
                                 <tr class="row-utama" onclick="togglePembantu(<?= $id_utama; ?>)">
                                     <td><?= $no++; ?></td>
@@ -114,19 +87,25 @@ function hitungPersentase($realisasi, $target)
                                         </div>
                                     </td>
                                     <td><?= $row['lokasi']; ?></td>
-                                    <td class="text-success">Rp <?= number_format($row['realisasi'], 0, ',', '.'); ?></td>
-                                    <td class="text-primary">Rp <?= number_format($row['target'], 0, ',', '.'); ?></td>
-
-                                    <?php $persen = hitungPersentase($row['realisasi'], $row['target']); ?>
+                                    <td class="text-success">Rp <?= number_format($realisasi_dana, 0, ',', '.'); ?></td>
+                                    <td class="text-primary">Rp <?= number_format($target_dana, 0, ',', '.'); ?></td>
                                     <td
                                         class="<?= ($persen >= 100) ? 'text-success' : (($persen >= 65) ? 'text-warning' : 'text-danger'); ?> font-bold">
                                         <?= $persen; ?>%
                                     </td>
 
+                                    <td style="color: #b91c1c; font-weight: bold;">
+                                        <?= $denda > 0 ? 'Rp ' . number_format($denda, 0, ',', '.') : '<span style="color: #94a3b8; font-weight: normal;">-</span>'; ?>
+                                    </td>
+
+                                    <td style="color: #16a34a; font-weight: bold;">
+                                        Rp <?= number_format($imbal_jasa, 0, ',', '.'); ?>
+                                    </td>
+
                                     <td style="text-align: center;">
                                         <div style="display: flex; gap: 8px; justify-content: center;">
                                             <button class="btn-action"
-                                                onclick="window.location.href='../super-admin/retribusi-detail.php?id=<?= $row['id']; ?>'"
+                                                onclick="window.location.href='retribusi-detail.php?id=<?= $row['id']; ?>'"
                                                 style="background-color: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">
                                                 Detail
                                             </button>
@@ -136,7 +115,7 @@ function hitungPersentase($realisasi, $target)
 
                                 <tr id="pembantu-<?= $id_utama; ?>" class="row-pembantu" style="display: none;">
                                     <td></td>
-                                    <td colspan="5">
+                                    <td colspan="7">
                                         <div class="pembantu-container">
                                             <?php if ($jumlah_pembantu > 0): ?>
                                                 <table class="table-inner">
@@ -181,7 +160,7 @@ function hitungPersentase($realisasi, $target)
     <div id="modalJukir" class="modal">
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 id="modalTitle">Tambah Juru Parkir</h3>
+                <h3 id="modalTitle">Tambah Petugas Parkir</h3>
                 <span style="cursor:pointer; font-size: 24px;" onclick="closeModal()">&times;</span>
             </div>
 
@@ -242,7 +221,7 @@ function hitungPersentase($realisasi, $target)
         const form = modal.querySelector('form');
 
         function openAddModal() {
-            document.getElementById('modalTitle').innerText = "Tambah Juru Parkir Baru";
+            document.getElementById('modalTitle').innerText = "Tambah Petugas Parkir Baru";
             form.action = "../store/proses_jukir.php?action=add";
             form.reset();
             document.getElementById('form_id').value = "";
@@ -252,7 +231,7 @@ function hitungPersentase($realisasi, $target)
         }
 
         function openEditModal(data) {
-            document.getElementById('modalTitle').innerText = "Edit Data Juru Parkir";
+            document.getElementById('modalTitle').innerText = "Edit Data Petugas Parkir";
             form.action = "../store/proses_jukir.php?action=edit";
 
             document.getElementById('form_id').value = data.id;

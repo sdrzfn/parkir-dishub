@@ -33,6 +33,11 @@ $hari_ini = (int) date('d');
 $rekomendasi = getRekomendasiAksi($persen, $hari_ini);
 
 $filterSetoran = filterSetoran($conn);
+
+$target = $d['target_bulanan'] ?: $d['target_lokasi'];
+$realisasi = mysqli_fetch_assoc($q_stats)['total'] ?? 0;
+$nilai_denda = hitungDenda($target, $realisasi);
+$imbal_jasa = hitungImbalJasa($realisasi);
 ?>
 
 <!DOCTYPE html>
@@ -104,7 +109,7 @@ $filterSetoran = filterSetoran($conn);
                             <h3 style="margin: 0 0 5px 0; color: #1e293b; font-size: 1.25rem; font-weight: 700;">
                                 <?= $d['nama_lengkap'] ?>
                             </h3>
-                            <span class="badge-role" style="display: inline-block;">Juru Parkir Utama</span>
+                            <span class="badge-role" style="display: inline-block;">Petugas Parkir Utama</span>
                         </div>
                         <button onclick="openEditJukirModal()" class="btn-edit-profile">
                             <i class="fas fa-edit"></i> Edit Profil
@@ -160,6 +165,35 @@ $filterSetoran = filterSetoran($conn);
                         </div>
                         <div class="progress-container">
                             <div class="progress-bar <?= $ind['bg'] ?>" style="width: <?= min($persen, 100) ?>%;">
+                            </div>
+                        </div>
+                        <div
+                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; border-top: 1px dashed #e2e8f0; padding-top: 15px;">
+                            <div
+                                style="background: #fff5f5; padding: 12px; border-radius: 8px; border-left: 4px solid #ef4444;">
+                                <span
+                                    style="font-size: 11px; color: #991b1b; display: block; font-weight: 600; text-transform: uppercase;">Sanksi
+                                    Denda (2%)</span>
+                                <span style="font-size: 15px; color: #b91c1c; font-weight: 700;">
+                                    Rp
+                                    <?= number_format($nilai_denda, 0, ',', '.') ?>
+                                </span>
+                                <small style="display: block; color: #7f1d1d; font-size: 10px; margin-top: 2px;">
+                                    <?= $nilai_denda > 0 ? '*Terhitung dari akumulasi tunggakan' : '*Target bulan ini terpenuhi' ?>
+                                </small>
+                            </div>
+                            <div
+                                style="background: #f0fdf4; padding: 12px; border-radius: 8px; border-left: 4px solid #10b981;">
+                                <span
+                                    style="font-size: 11px; color: #166534; display: block; font-weight: 600; text-transform: uppercase;">Hak
+                                    Imbal Jasa Jukir (40%)</span>
+                                <span style="font-size: 15px; color: #15803d; font-weight: 700;">
+                                    Rp
+                                    <?= number_format($imbal_jasa, 0, ',', '.') ?>
+                                </span>
+                                <small style="display: block; color: #14532d; font-size: 10px; margin-top: 2px;">
+                                    *Upah bagi hasil dari realisasi setoran
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -294,7 +328,7 @@ $filterSetoran = filterSetoran($conn);
                                                 <td colspan="4" style="padding: 30px; text-align: center; color: #94a3b8;">
                                                     <i class="fas fa-folder-open"
                                                         style="display: block; font-size: 24px; margin-bottom: 10px;"></i>
-                                                    Belum ada riwayat dokumen untuk juru parkir ini.
+                                                    Belum ada riwayat dokumen untuk petugas parkir ini.
                                                 </td>
                                             </tr>
                                         <?php endif; ?>
@@ -312,7 +346,7 @@ $filterSetoran = filterSetoran($conn);
     <div id="modalEditJukir" class="modal-backdrop" style="display: none;">
         <div class="modal-content-edit">
             <div class="modal-header">
-                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">Edit Data Juru Parkir</h3>
+                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">Edit Data Petugas Parkir</h3>
                 <button onclick="closeEditJukirModal()" class="btn-close-modal"><i class="fas fa-times"></i></button>
             </div>
             <form action="../store/proses_jukir.php?action=edit" method="POST" class="modal-body">
@@ -393,7 +427,7 @@ $filterSetoran = filterSetoran($conn);
             </div>
 
             <form action="../store/proses_retribusi.php" method="POST" class="modal-form">
-                <input type="hidden" name="id_jukir" id="edit_id_jukir_hidden">
+                <input type="hidden" name="id_jukir" id="edit_id_jukir_hidden" value="<?= $id_jukir ?>">
                 <input type="hidden" name="id_setoran" id="edit_id">
 
                 <div class="form-group">
@@ -421,57 +455,152 @@ $filterSetoran = filterSetoran($conn);
     </div>
 
     <script>
+        // modal tambah setoran
         function openModal() {
-            const modal = document.getElementById('modalSetoran');
-            modal.style.display = 'flex';
+            document.getElementById('modalSetoran').style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
 
         function closeModal() {
-            const modal = document.getElementById('modalSetoran');
-            modal.style.display = 'none';
+            document.getElementById('modalSetoran').style.display = 'none';
             document.body.style.overflow = 'auto';
         }
 
-        // Fungsi untuk Modal Edit Jukir
-        function openEditJukirModal() {
-            const modal = document.getElementById('modalEditJukir');
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
+        // Intercept submit form tambah setoran
+        document.getElementById('modalSetoran')
+            .querySelector('form')
+            .addEventListener('submit', function (e) {
+                e.preventDefault();
 
-        function closeEditJukirModal() {
-            const modal = document.getElementById('modalEditJukir');
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
+                const form = this;
+                const nominal = document.querySelector('[name="jumlah"]').value;
+                const termin = document.querySelector('[name="termin"]').value;
+                const tanggal = document.querySelector('[name="tanggal"]').value;
+                const tgl_fmt = new Date(tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+                const rp = 'Rp ' + Number(nominal).toLocaleString('id-ID');
 
-        // Handler klik di luar modal untuk menutup
-        window.onclick = function (event) {
-            let modalSetoran = document.getElementById('modalSetoran');
-            let modalEdit = document.getElementById('modalEditJukir');
+                Swal.fire({
+                    title: 'Konfirmasi Input Setoran',
+                    html: `
+                <div style="text-align:left; font-size:14px; color:#334155; line-height:2;">
+                    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9;">
+                        <span style="color:#94a3b8; font-weight:600;">Nominal</span>
+                        <span style="font-weight:700; color:#10b981; font-size:16px;">${rp}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9;">
+                        <span style="color:#94a3b8; font-weight:600;">Termin</span>
+                        <span style="font-weight:600; color:#1e293b;">Termin ${termin}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:8px 0;">
+                        <span style="color:#94a3b8; font-weight:600;">Tanggal</span>
+                        <span style="font-weight:600; color:#1e293b;">${tgl_fmt}</span>
+                    </div>
+                </div>
+                <p style="margin-top:16px; font-size:13px; color:#64748b;">
+                    Pastikan data sudah benar sebelum disimpan.
+                </p>`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="fas fa-save"></i> Ya, Simpan',
+                    cancelButtonText: 'Periksa Lagi',
+                    confirmButtonColor: '#2563eb',
+                    cancelButtonColor: '#e2e8f0',
+                    customClass: {
+                        cancelButton: 'swal-cancel-dark',
+                        popup: 'swal-popup-custom',
+                    },
+                    reverseButtons: true,
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
 
-            if (event.target == modalSetoran) {
-                closeModal();
-            }
-            if (event.target == modalEdit) {
-                closeEditJukirModal();
-            }
-        }
-
+        // MODAL EDIT SETORAN
         function openEditModal(btn) {
             document.getElementById('edit_id').value = btn.getAttribute('data-id');
-            document.getElementById('edit_id_jukir_hidden').value = btn.getAttribute('data-id_jukir');
+            const idJukirFallback = btn.getAttribute('data-id-jukir') || "<?= $id_jukir ?>";
+            document.getElementById('edit_id_jukir_hidden').value = idJukirFallback;
             document.getElementById('edit_tanggal').value = btn.getAttribute('data-tanggal');
             document.getElementById('edit_termin').value = btn.getAttribute('data-termin');
             document.getElementById('edit_nominal').value = btn.getAttribute('data-nominal');
-            document.getElementById('modalEdit').style.display = 'block';
+            document.getElementById('modalEdit').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
 
         function closeEditModal() {
             document.getElementById('modalEdit').style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
 
+        document.getElementById('modalEdit')
+            .querySelector('form')
+            .addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const form = this;
+                const nominal = document.getElementById('edit_nominal').value;
+                const termin = document.getElementById('edit_termin').value;
+                const tanggal = document.getElementById('edit_tanggal').value;
+                const tgl_fmt = new Date(tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+                const rp = 'Rp ' + Number(nominal).toLocaleString('id-ID');
+
+                Swal.fire({
+                    title: 'Konfirmasi Perubahan Setoran',
+                    html: `
+                <div style="text-align:left; font-size:14px; color:#334155; line-height:2;">
+                    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9;">
+                        <span style="color:#94a3b8; font-weight:600;">Nominal Baru</span>
+                        <span style="font-weight:700; color:#10b981; font-size:16px;">${rp}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9;">
+                        <span style="color:#94a3b8; font-weight:600;">Termin</span>
+                        <span style="font-weight:600; color:#1e293b;">Termin ${termin}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:8px 0;">
+                        <span style="color:#94a3b8; font-weight:600;">Tanggal</span>
+                        <span style="font-weight:600; color:#1e293b;">${tgl_fmt}</span>
+                    </div>
+                </div>
+                <p style="margin-top:16px; font-size:13px; color:#64748b;">
+                    Data setoran yang lama akan ditimpa. Lanjutkan?
+                </p>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="fas fa-check"></i> Ya, Perbarui',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#2563eb',
+                    cancelButtonColor: '#e2e8f0',
+                    customClass: {
+                        cancelButton: 'swal-cancel-dark',
+                        popup: 'swal-popup-custom',
+                    },
+                    reverseButtons: true,
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+
+        // MODAL EDIT JUKIR
+        function openEditJukirModal() {
+            document.getElementById('modalEditJukir').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEditJukirModal() {
+            document.getElementById('modalEditJukir').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        window.addEventListener('click', function (e) {
+            if (e.target === document.getElementById('modalSetoran')) closeModal();
+            if (e.target === document.getElementById('modalEdit')) closeEditModal();
+            if (e.target === document.getElementById('modalEditJukir')) closeEditJukirModal();
+        });
+
+        // LOAD RIWAYAT SETORAN
         function loadRiwayat() {
             const bulan = document.getElementById('filterBulan').value;
             const tahun = document.getElementById('filterTahun').value;
@@ -481,20 +610,19 @@ $filterSetoran = filterSetoran($conn);
             area.style.opacity = '0.5';
             fetch(`../config/retribusi.php?bulan=${bulan}&tahun=${tahun}&id_jukir=${idJukir}&ajax_riwayat=1`)
                 .then(res => {
-                    if (!res.ok) throw new Error('Network response was not ok');
+                    if (!res.ok) throw new Error('Network error');
                     return res.text();
                 })
                 .then(data => {
                     area.innerHTML = data;
                     area.style.opacity = '1';
                 })
-                .catch(err => {
-                    console.error('Gagal memuat riwayat:', err);
-                    area.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:20px; color:red;'>Gagal mengambil data.</td></tr>";
+                .catch(() => {
+                    area.innerHTML = "<tr><td colspan='5' style='text-align:center;padding:20px;color:red;'>Gagal mengambil data.</td></tr>";
                     area.style.opacity = '1';
                 });
         }
-
+        // TOAST NOTIFIKASI STATUS (setelah redirect)
         (function () {
             const params = new URLSearchParams(window.location.search);
             const status = params.get('status');
@@ -509,15 +637,9 @@ $filterSetoran = filterSetoran($conn);
             });
 
             if (status === 'tambah') {
-                toast.fire({
-                    icon: 'success',
-                    title: 'Setoran berhasil ditambahkan!'
-                });
+                toast.fire({ icon: 'success', title: 'Setoran berhasil ditambahkan!' });
             } else if (status === 'edit') {
-                toast.fire({
-                    icon: 'success',
-                    title: 'Data setoran berhasil diperbarui!'
-                });
+                toast.fire({ icon: 'success', title: 'Data setoran berhasil diperbarui!' });
             } else if (status === 'error') {
                 Swal.fire({
                     icon: 'error',
@@ -527,7 +649,6 @@ $filterSetoran = filterSetoran($conn);
                 });
             }
 
-            // Bersihkan parameter dari URL tanpa reload
             if (status) {
                 const url = new URL(window.location);
                 url.searchParams.delete('status');

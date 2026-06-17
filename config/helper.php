@@ -38,4 +38,33 @@ function getPerformanceStatus($realisasi, $target) {
         ];
     }
 }
+
+/**
+ * Redirect kembali ke halaman asal berdasarkan role.
+ * 
+ * @param string $page     Nama file tujuan
+ * @param array  $params   Query string tambahan
+ */
+function redirectBack(string $page, array $params = []): void
+{
+    $role_folders = [
+        'super-admin'   => 'super-admin',
+        'kepala-dinas'  => 'kepala-dinas',
+        'bendahara'     => 'bendahara',
+    ];
+
+    $role   = $_SESSION['role'] ?? 'admin';
+    $folder = $role_folders[$role] ?? null;
+
+    if ($folder) {
+        $base = "../{$folder}/";
+    } else {
+        $base = "../";
+    }
+
+    $query = !empty($params) ? '?' . http_build_query($params) : '';
+
+    header("Location: {$base}{$page}{$query}");
+    exit;
+}
 ?>

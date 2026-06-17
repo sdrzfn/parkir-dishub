@@ -84,8 +84,8 @@ if (empty($kecamatan_labels)) {
 
             <div class="container">
                 <div style="margin-bottom: 2rem;">
-                    <h1 style="font-size: 1.8rem; color: #1e293b; font-weight: 800">Dashboard Keuangan Retribusi</h1>
-                    <p style="color: #64748b;">Periode Berjalan: <strong><?= date('F Y'); ?></strong></p>
+                    <h1 class="page-title">Dashboard Keuangan Retribusi</h1>
+                    <p class="page-subtitle">Periode Berjalan: <strong><?= date('F Y'); ?></strong></p>
                 </div>
 
                 <div class="stats-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">

@@ -9,7 +9,7 @@ if (!isset($breadcrumbs)) {
         ],
         'tukang-parkir.php'      => [
             ['label' => 'Dashboard',  'url' => 'index.php'],
-            ['label' => 'Juru Parkir','url' => ''],
+            ['label' => 'Petugas Parkir','url' => ''],
         ],
         'retribusi-parkir.php'   => [
             ['label' => 'Dashboard',  'url' => 'index.php'],
@@ -36,6 +36,10 @@ if (!isset($breadcrumbs)) {
             ['label' => 'Dashboard',          'url' => 'index.php'],
             ['label' => 'Koordinator Wilayah','url' => 'koordinator-wilayah.php'],
             ['label' => 'Detail Korwil','url' => ''],
+        ],
+        'profile.php'    => [
+            ['label' => 'Dashboard',     'url' => 'index.php'],
+            ['label' => 'Profile','url' => ''],
         ],
     ];
     $breadcrumbs = $page_map[$current_file] ?? [['label' => 'Dashboard', 'url' => 'index.php']];

@@ -2,12 +2,6 @@
 $current_page = basename($_SERVER['PHP_SELF']);
 $role = $_SESSION['role'] ?? '';
 
-/**
- * LOGIKA PENENTUAN PATH
- * 1. Admin (di root): Tidak butuh "../" untuk ke halaman lain, tapi butuh path langsung.
- * 2. Super Admin / Kepala Dinas (di folder): Butuh "../" untuk akses asset, tapi tetap di folder yang sama untuk link menu.
- */
-
 if ($role === 'super-admin' || $role === 'kepala-dinas' || $role === 'bendahara') {
     $base_url = "";
     $asset_path = "../assets/";
@@ -36,12 +30,21 @@ if ($role === 'super-admin' || $role === 'kepala-dinas' || $role === 'bendahara'
     </div> -->
 
         <ul class="nav-menu">
-            <?php if ($role === 'admin'): ?>
+            <?php if ($role === 'admin' || $role === 'kepala-dinas'): ?>
                 <li class="nav-item">
                     <a href="<?= $base_url; ?>index.php"
                         class="nav-link <?= ($current_page == 'index.php') ? 'active' : ''; ?>" title="Dashboard">
                         <img src="<?= $asset_path; ?>icons/dashboard.svg" class="nav-icon">
                         <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="<?= $base_url; ?>retribusi-parkir.php"
+                        class="nav-link <?= ($current_page == 'retribusi-parkir.php') ? 'active' : ''; ?>"
+                        title="Retribusi">
+                        <img src="<?= $asset_path; ?>icons/retribusi.svg" class="nav-icon">
+                        <span class="nav-text">Retribusi</span>
                     </a>
                 </li>
 
@@ -64,20 +67,11 @@ if ($role === 'super-admin' || $role === 'kepala-dinas' || $role === 'bendahara'
 
                 <li class="nav-item">
                     <a href="<?= $base_url; ?>tukang-parkir.php"
-                        class="nav-link <?= ($current_page == 'tukang-parkir.php') ? 'active' : ''; ?>" title="Juru Parkir">
+                        class="nav-link <?= ($current_page == 'tukang-parkir.php') ? 'active' : ''; ?>" title="Petugas Parkir">
                         <img src="<?= $asset_path; ?>icons/juru-parkir.svg" class="nav-icon">
-                        <span class="nav-text">Juru Parkir</span>
+                        <span class="nav-text">Petugas Parkir</span>
                     </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="<?= $base_url; ?>retribusi-parkir.php"
-                        class="nav-link <?= ($current_page == 'retribusi-parkir.php') ? 'active' : ''; ?>"
-                        title="Retribusi">
-                        <img src="<?= $asset_path; ?>icons/retribusi.svg" class="nav-icon">
-                        <span class="nav-text">Retribusi</span>
-                    </a>
-                </li>
+                </li>                
 
                 <li class="nav-item">
                     <a href="<?= $base_url; ?>peta.php"
@@ -98,6 +92,15 @@ if ($role === 'super-admin' || $role === 'kepala-dinas' || $role === 'bendahara'
                 </li>
 
                 <li class="nav-item">
+                    <a href="<?= $base_url; ?>retribusi-parkir.php"
+                        class="nav-link <?= ($current_page == 'retribusi-parkir.php') ? 'active' : ''; ?>"
+                        title="Retribusi">
+                        <img src="<?= $asset_path; ?>icons/retribusi.svg" class="nav-icon">
+                        <span class="nav-text">Retribusi</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a href="<?= $base_url; ?>lokasi.php"
                         class="nav-link <?= ($current_page == 'lokasi.php') ? 'active' : ''; ?>" title="Lokasi">
                         <img src="<?= $asset_path; ?>icons/location.svg" class="nav-icon">
@@ -116,18 +119,9 @@ if ($role === 'super-admin' || $role === 'kepala-dinas' || $role === 'bendahara'
 
                 <li class="nav-item">
                     <a href="<?= $base_url; ?>tukang-parkir.php"
-                        class="nav-link <?= ($current_page == 'tukang-parkir.php') ? 'active' : ''; ?>" title="Juru Parkir">
+                        class="nav-link <?= ($current_page == 'tukang-parkir.php') ? 'active' : ''; ?>" title="Petugas Parkir">
                         <img src="<?= $asset_path; ?>icons/juru-parkir.svg" class="nav-icon">
-                        <span class="nav-text">Juru Parkir</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="<?= $base_url; ?>retribusi-parkir.php"
-                        class="nav-link <?= ($current_page == 'retribusi-parkir.php') ? 'active' : ''; ?>"
-                        title="Retribusi">
-                        <img src="<?= $asset_path; ?>icons/retribusi.svg" class="nav-icon">
-                        <span class="nav-text">Retribusi</span>
+                        <span class="nav-text">Petugas Parkir</span>
                     </a>
                 </li>
 

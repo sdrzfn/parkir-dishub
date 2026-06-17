@@ -5,22 +5,7 @@ checkLogin();
 $user = current_user();
 allowRole(['admin']);
 
-$id_korwil = $_GET['id'];
-
-$korwil_query = mysqli_query($conn, "SELECT * FROM koordinator_wilayah WHERE id = '$id_korwil'");
-$korwil = mysqli_fetch_assoc($korwil_query);
-
-$sql_utama = "SELECT jukir_utama.*, lokasi.nama_lokasi 
-              FROM jukir_utama 
-              LEFT JOIN lokasi ON jukir_utama.id_lokasi = lokasi.id 
-              WHERE jukir_utama.id_korwil = '$id_korwil'";
-$res_utama = mysqli_query($conn, $sql_utama);
-
-$sql_pembantu = "SELECT jukir_pembantu.*, jukir_utama.nama_lengkap as nama_induk 
-                 FROM jukir_pembantu 
-                 LEFT JOIN jukir_utama ON jukir_pembantu.id_utama = jukir_utama.id 
-                 WHERE jukir_pembantu.id_korwil = '$id_korwil'";
-$res_pembantu = mysqli_query($conn, $sql_pembantu);
+include 'api/fetch_korwil.php';
 ?>
 
 <!DOCTYPE html>
@@ -40,7 +25,18 @@ $res_pembantu = mysqli_query($conn, $sql_pembantu);
                     style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 5px solid var(--primary);">
                     <h2 style="margin: 0;"><?= $korwil['wilayah']; ?></h2>
                     <p style="margin: 5px 0 0; color: #666;">Koordinator:
-                        <strong><?= $korwil['nama_korwil']; ?></strong></p>
+                        <strong><?= $korwil['nama_korwil']; ?></strong>
+                    </p>
+                    <p style="margin: 5px 0 0; color: #666;">Jumlah Jukir Utama:
+                        <strong>
+                            <?= $jumlah_jukir_utama['total_jukir_utama']; ?>
+                        </strong>
+                    </p>
+                    <p style="margin: 5px 0 0; color: #666;">Jumlah Jukir Pembantu:
+                        <strong>
+                            <?= $jumlah_jukir_pembantu['total_jukir_pembantu']; ?>
+                        </strong>
+                    </p>
                 </div>
 
                 <h3 style="color: var(--sidebar-bg);">Daftar Jukir Utama & Lokasi</h3>
@@ -65,6 +61,12 @@ $res_pembantu = mysqli_query($conn, $sql_pembantu);
                                     <td><?= $u['no_telp']; ?></td>
                                 </tr>
                             <?php endwhile; ?>
+                            <tr>
+                                <td><strong>JUMLAH JUKIR UTAMA:</strong></td>
+                                <td></td>
+                                <td></td>
+                                <td><strong><?= $jumlah_jukir_utama['total_jukir_utama']; ?></strong></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -87,6 +89,11 @@ $res_pembantu = mysqli_query($conn, $sql_pembantu);
                                     <td><?= $p['alamat_pembantu']; ?></td>
                                 </tr>
                             <?php endwhile; ?>
+                            <tr>
+                                <td><strong>JUMLAH JUKIR PEMBANTU:</strong></td>
+                                <td></td>
+                                <td><strong><?= $jumlah_jukir_pembantu['total_jukir_pembantu']; ?></strong></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

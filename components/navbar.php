@@ -7,6 +7,18 @@ if ($role === 'super-admin' || $role === 'kepala-dinas' || $role === 'bendahara'
 } else {
     $logout_path = "auth/logout.php";
 }
+
+if ($role === 'super-admin' || $role === 'kepala-dinas' || $role === 'bendahara') {
+    $img_folder = "../assets/img/users/";
+    $default_avatar = "../assets/img/default-avatar.png";
+} else {
+    $img_folder = "assets/img/users/";
+    $default_avatar = "assets/img/default-avatar.png";
+}
+
+$user_id = $_SESSION['user_id'];
+$query_user = mysqli_query($conn, "SELECT nama, foto FROM users WHERE id = '$user_id'");
+$user_navbar = mysqli_fetch_assoc($query_user);
 ?>
 
 <header class="header">
@@ -18,12 +30,12 @@ if ($role === 'super-admin' || $role === 'kepala-dinas' || $role === 'bendahara'
             </svg>
         </button>
         <!-- <img src="../assets/img/logo-kab-sidoarjo.png" alt="Logo Sidoarjo" style="height: 45px;"> -->
-        <img src="../assets/img/Logo-Dishub.png" alt="Logo Dishub" style="height: 45px; margin-right: 5px; margin-left: 10px;">
+        <img src="../assets/img/Logo-Dishub.png" alt="Logo Dishub"
+            style="height: 45px; margin-right: 5px; margin-left: 10px;">
         <div style="border-left: 3px solid #e2e8f0; height: 30px;"></div>
-        <div style="margin-left: 5px;">
-            <h2
-                style="margin: 0; font-size: 1rem; color: var(--primary-color); letter-spacing: 1px; font-weight: 800;">
-                SI-PARKIR <span style="font-weight: 400; color: #64748b;">Dishub Sidoarjo</span>
+        <div class="navbar-label">
+            <h2 class="navbar-label-text">
+                SI-PARKIR <span class="navbar-label-sub">Dishub Sidoarjo</span>
             </h2>
         </div>
     </div>
@@ -38,7 +50,14 @@ if ($role === 'super-admin' || $role === 'kepala-dinas' || $role === 'bendahara'
                     Petugas Dinas</div>
             </div>
             <div style="position: relative;">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=003366&color=fff"
+                <?php
+                $nama_file_foto = $user_navbar['foto'] ?? '';
+                $foto_path = (!empty($nama_file_foto) && file_exists($img_folder . $nama_file_foto))
+                    ? $img_folder . $nama_file_foto
+                    : $default_avatar;
+                ?>
+
+                <img src="<?= $foto_path; ?>" alt="Profile Image"
                     style="width: 42px; height: 42px; border-radius: 12px; object-fit: cover; border: 2px solid #f1f5f9;">
                 <div
                     style="position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid white;">

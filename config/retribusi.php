@@ -139,3 +139,21 @@ function filterSetoran($conn)
         exit;
     }
 }
+
+/**
+ * Fungsi menghitung denda jika realisasi kurang dari target
+ */
+function hitungDenda($target, $realisasi) {
+    if ($realisasi >= $target) {
+        return 0;
+    }
+    $tunggakan = $target - $realisasi;
+    return 0.02 * $tunggakan; // Denda 2% dari sisa tunggakan
+}
+
+/**
+ * Fungsi menghitung bagi hasil / imbal jasa jukir 40%
+ */
+function hitungImbalJasa($realisasi) {
+    return 0.40 * $realisasi; // 40% dari total pendapatan yang disetor
+}

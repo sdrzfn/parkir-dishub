@@ -30,24 +30,42 @@ $lokasi_data = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $lokasi_data[] = $row;
 }
-// $q_retribusi = mysqli_query($conn, "SELECT SUM(target_bulanan) as total FROM lokasi");
-// $res_retribusi = mysqli_fetch_assoc($q_retribusi);
-// $total_retribusi = $res_retribusi['total'] ?? 0;
 
-// $q_lokasi = mysqli_query($conn, "SELECT COUNT(*) as total FROM lokasi");
-// $total_lokasi = mysqli_fetch_assoc($q_lokasi)['total'];
+$q_kecamatan = mysqli_query(
+    $conn,
+    "SELECT 
+        kw.wilayah AS kecamatan,
+        SUM(t.jumlah_setoran) AS total
+    FROM transaksi_retribusi t
+    JOIN jukir_utama ju ON t.id_jukir = ju.id
+    JOIN koordinator_wilayah kw ON ju.id_korwil = kw.id
+    WHERE t.bulan = MONTH(CURRENT_DATE())
+      AND t.tahun = YEAR(CURRENT_DATE())
+    GROUP BY kw.id, kw.wilayah
+    ORDER BY total DESC
+"
+);
 
-// $q_korwil = mysqli_query($conn, "SELECT COUNT(*) as total FROM koordinator_wilayah");
-// $total_korwil = mysqli_fetch_assoc($q_korwil)['total'];
+$kecamatan_labels = [];
+$kecamatan_data = [];
 
-// $q_utama = mysqli_query($conn, "SELECT COUNT(*) as total FROM jukir_utama");
-// $total_utama = mysqli_fetch_assoc($q_utama)['total'];
+while ($k = mysqli_fetch_assoc($q_kecamatan)) {
+    $kecamatan_labels[] = ucwords($k['kecamatan']);
+    $kecamatan_data[] = (float) $k['total'];
+}
 
-// $q_pembantu = mysqli_query($conn, "SELECT COUNT(*) as total FROM jukir_pembantu");
-// $total_pembantu = mysqli_fetch_assoc($q_pembantu)['total'];
-
-// $q_wilayah = mysqli_query($conn, "SELECT COUNT(DISTINCT wilayah) as total FROM koordinator_wilayah");
-// $total_wilayah = mysqli_fetch_assoc($q_wilayah)['total'];
+if (empty($kecamatan_labels)) {
+    $q_fallback = mysqli_query($conn, "SELECT kw.wilayah AS kecamatan, SUM(ju.target_bulanan) AS total
+        FROM jukir_utama ju
+        JOIN koordinator_wilayah kw ON ju.id_korwil = kw.id
+        GROUP BY kw.id, kw.wilayah
+        ORDER BY total DESC
+    ");
+    while ($k = mysqli_fetch_assoc($q_fallback)) {
+        $kecamatan_labels[] = ucwords($k['kecamatan']);
+        $kecamatan_data[] = (float) $k['total'];
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -66,8 +84,8 @@ while ($row = mysqli_fetch_assoc($result)) {
 
             <div class="container">
                 <div style="margin-bottom: 2rem;">
-                    <h1 style="font-size: 1.8rem; color: #1e293b; font-weight: 800">Dashboard Keuangan Retribusi</h1>
-                    <p style="color: #64748b;">Periode Berjalan: <strong><?= date('F Y'); ?></strong></p>
+                    <h1 class="page-title">Dashboard Keuangan Retribusi</h1>
+                    <p class="page-subtitle">Periode Berjalan: <strong><?= date('F Y'); ?></strong></p>
                 </div>
 
                 <div class="stats-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
@@ -140,7 +158,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                             <p style="font-size: 13px; color: #64748b; margin-top: 4px;">Wilayah Operasional Kabupaten
                                 Sidoarjo</p>
                         </div>
-                        <a href="../super-admin/peta.php"
+                        <a href="peta.php"
                             style="background: #3b82f6; color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.15); display: flex; align-items: center; gap: 8px;">
                             <i class="fas fa-expand-arrows-alt"></i> Lihat Peta Detail
                         </a>
@@ -156,7 +174,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
@@ -164,24 +182,6 @@ while ($row = mysqli_fetch_assoc($result)) {
         const dataTren = <?= json_encode($data_tren); ?>;
         const totalTarget = <?= $summary['total_target']; ?>;
         const totalRealisasi = <?= $summary['total_realisasi']; ?>;
-
-        // new Chart(document.getElementById('barChart'), {
-        //     type: 'bar',
-        //     data: {
-        //         labels: labelsBulan,
-        //         datasets: [{
-        //             label: 'Setoran (Rp)',
-        //             data: dataTren,
-        //             backgroundColor: '#3b82f6',
-        //             borderRadius: 8
-        //         }]
-        //     },
-        //     options: {
-        //         responsive: true,
-        //         maintainAspectRatio: false,
-        //         plugins: { legend: { display: false } }
-        //     }
-        // });
 
         new Chart(document.getElementById('pieChart'), {
             type: 'doughnut',
@@ -210,7 +210,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                     attribution: '&copy; OpenStreetMap contributors'
                 }).addTo(map);
 
-                // Render Marker dari PHP
                 const locations = <?= json_encode($lokasi_data) ?>;
 
                 if (locations && locations.length > 0) {
@@ -236,6 +235,119 @@ while ($row = mysqli_fetch_assoc($result)) {
                 }
             } catch (error) {
                 console.error("Gagal memuat peta:", error);
+            }
+        });
+
+        (function () {
+            var labels = <?= json_encode($kecamatan_labels) ?>;
+            var values = <?= json_encode($kecamatan_data) ?>;
+            var palette = [
+                '#2563eb', // biru utama
+                '#16a34a', // hijau
+                '#d97706', // amber
+                '#dc2626', // merah
+                '#7c3aed', // ungu
+                '#0891b2', // cyan
+                '#db2777', // pink
+                '#65a30d', // lime
+            ];
+
+            var ctx = document.getElementById('chartKecamatan').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: palette.slice(0, labels.length),
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverOffset: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 11, family: "'DM Sans', 'Segoe UI', sans-serif" },
+                                color: '#475569',
+                                padding: 14,
+                                usePointStyle: true,
+                                pointStyleWidth: 8,
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (ctx) {
+                                    var total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                    var pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+                                    var rupiah = 'Rp ' + ctx.parsed.toLocaleString('id-ID');
+                                    return ' ' + ctx.label + ': ' + rupiah + ' (' + pct + '%)';
+                                }
+                            },
+                            backgroundColor: '#1e293b',
+                            titleColor: '#94a3b8',
+                            bodyColor: '#f8fafc',
+                            padding: 12,
+                            cornerRadius: 8,
+                        }
+                    }
+                }
+            });
+        })();
+
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: labelsBulan,
+                datasets: [{
+                    label: 'Total Setoran',
+                    data: dataTren,
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                animation: {
+                    duration: 500
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let value = context.raw;
+                                return 'Setoran: Rp ' + value.toLocaleString('id-ID');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                if (value >= 1000000) {
+                                    return (value / 1000000).toFixed(1) + ' Jt';
+                                } else if (value >= 1000) {
+                                    return (value / 1000).toFixed(0) + ' Rb';
+                                }
+                                return value;
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
             }
         });
     </script>

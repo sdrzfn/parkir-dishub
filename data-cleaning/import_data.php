@@ -1,13 +1,11 @@
 <?php
-include 'config/db.php';
+include '../config/db.php';
 
-// Tingkatkan batas waktu eksekusi agar tidak timeout jika data banyak
 set_time_limit(0);
 
-$filename = "Data-Parkir-Dishub.csv"; // Nama file CSV kamu
+$filename = "Data-Parkir-Dishub.csv";
 $file = fopen($filename, "r");
 
-// Lewati baris pertama (header)
 fgetcsv($file, 10000, ";");
 
 echo "Proses import dimulai...<br>";
@@ -16,7 +14,6 @@ $last_id_lokasi = null;
 $last_id_utama = null;
 
 while (($column = fgetcsv($file, 10000, ";")) !== FALSE) {
-    // Lewati jika baris benar-benar kosong
     if (empty(array_filter($column)))
         continue;
 
@@ -66,15 +63,58 @@ while (($column = fgetcsv($file, 10000, ";")) !== FALSE) {
     }
 
     // Data Setoran (Tanggal 1, 11, 21)
-    if ($last_id_lokasi) {
-        $tgl1 = (float) str_replace(['.', ','], ['', '.'], $column[16]);
-        $tgl11 = (float) str_replace(['.', ','], ['', '.'], $column[17]);
-        $tgl21 = (float) str_replace(['.', ','], ['', '.'], $column[18]);
-        $bulan = date('Y-m-01');
+    // if ($last_id_lokasi) {
+    //     $tgl1 = (float) str_replace(['.', ','], ['', '.'], $column[16]);
+    //     $tgl11 = (float) str_replace(['.', ','], ['', '.'], $column[17]);
+    //     $tgl21 = (float) str_replace(['.', ','], ['', '.'], $column[18]);
+    //     $bulan = date('Y-m-01');
 
-        $sql_s = "INSERT INTO setoran_retribusi (id_lokasi, bulan_tahun, setoran_tgl_1, setoran_tgl_11, setoran_tgl_21) 
-                  VALUES ('$last_id_lokasi', '$bulan', '$tgl1', '$tgl11', '$tgl21')";
-        mysqli_query($conn, $sql_s);
+    //     $sql_s = "INSERT INTO setoran_retribusi (id_lokasi, bulan_tahun, setoran_tgl_1, setoran_tgl_11, setoran_tgl_21) 
+    //               VALUES ('$last_id_lokasi', '$bulan', '$tgl1', '$tgl11', '$tgl21')";
+    //     mysqli_query($conn, $sql_s);
+    // }
+
+    if ($last_id_utama) {
+        $current_month = (int) date('m');
+        $current_year = (int) date('Y');
+        $year_month = date('Y-m-');
+
+        $data_setoran = [
+            ['nominal' => $column[16], 'termin' => '1', 'tanggal' => $year_month . '01'],
+            ['nominal' => $column[17], 'termin' => '2', 'tanggal' => $year_month . '11'],
+            ['nominal' => $column[18], 'termin' => '3', 'tanggal' => $year_month . '21'],
+        ];
+
+        foreach ($data_setoran as $setoran) {
+            $jumlah = (float) str_replace(['.', ','], ['', '.'], $setoran['nominal']);
+
+            if ($jumlah > 0) {
+                $tanggal = $setoran['tanggal'];
+                $termin = $setoran['termin'];
+
+                $sql_s = "INSERT INTO transaksi_retribusi (
+                        id_jukir, 
+                        jumlah_setoran, 
+                        tanggal_setoran, 
+                        metode_pembayaran, 
+                        termin, 
+                        bulan, 
+                        tahun,
+                        keterangan
+                    ) VALUES (
+                        '$last_id_utama', 
+                        '$jumlah', 
+                        '$tanggal', 
+                        'tunai', 
+                        '$termin', 
+                        '$current_month', 
+                        '$current_year',
+                        'Import dari CSV'
+                    )";
+
+                mysqli_query($conn, $sql_s);
+            }
+        }
     }
 
     $row_count++;

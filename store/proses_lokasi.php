@@ -1,5 +1,9 @@
 <?php
 include '../config/db.php';
+include '../config/auth.php';
+include '../config/helper.php';
+checkLogin();
+allowRole(['admin', 'super-admin', 'kepala-dinas', 'bendahara']);
 
 $action = $_GET['action'] ?? '';
 if ($action == 'add' || $action == 'edit') {
@@ -22,7 +26,7 @@ if ($action == 'add' || $action == 'edit') {
     }
 
     if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
-        $target_dir = "../assets/images/lokasi/";
+        $target_dir = "../assets/img/lokasi/";
         $file_ext = pathinfo($_FILES["foto"]["name"], PATHINFO_EXTENSION);
         $new_name = "LOK_" . time() . "." . $file_ext;
         $target_file = $target_dir . $new_name;
@@ -48,22 +52,23 @@ if ($action == 'add' || $action == 'edit') {
     }
 
     if (mysqli_query($conn, $sql)) {
-        echo "Data berhasil diubah";
-        header("Location: ../lokasi.php");
+        redirectBack('lokasi.php', ['status' => 'success']);
+        exit;
     } else {
-        echo "Error: " . mysqli_error($conn);
+        redirectBack('lokasi.php', ['status' => 'error', 'msg' => mysqli_error($conn)]);
+        exit;
     }
 }
 
 // Logika Hapus Data
 if ($action == 'delete') {
-    $id = $_GET['id'];
+    $id = mysqli_real_escape_string($conn, $_GET['id']);
 
     $get_foto = mysqli_query($conn, "SELECT foto FROM lokasi WHERE id=$id");
     $data = mysqli_fetch_assoc($get_foto);
 
     if (!empty($data['foto'])) {
-        $path = "../assets/images/lokasi/" . $data['foto'];
+        $path = "../assets/img/lokasi/" . $data['foto'];
         if (file_exists($path)) {
             unlink($path);
         }
@@ -71,12 +76,11 @@ if ($action == 'delete') {
 
     $sql = "DELETE FROM lokasi WHERE id=$id";
     if (mysqli_query($conn, $sql)) {
-        $message = "Data berhasil dihapus!";
-        echo "<script>alert('$message');</script>";
-
-        header("Location: ../lokasi.php");
+        redirectBack('lokasi.php', ['status' => 'delete']);
+        exit;
     } else {
-        echo "Error: " . mysqli_error($conn);
+        redirectBack('lokasi.php', ['status' => 'error', 'msg' => mysqli_error($conn)]);
+        exit;
     }
 }
 ?>

@@ -5,58 +5,9 @@ checkLogin();
 $user = current_user();
 allowRole(['super-admin']);
 
-$bulan_ini = date('F Y');
-
-$limit = 25;
-$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-$offset = ($page - 1) * $limit;
-
-$total_result = mysqli_query($conn, "SELECT COUNT(*) AS total FROM lokasi");
-$total_row = mysqli_fetch_assoc($total_result)['total'];
-$total_pages = ceil($total_row / $limit);
-
-$search = isset($_GET['search']) ? trim($_GET['search']) : '';
-$kecamatan = isset($_GET['kecamatan']) ? trim($_GET['kecamatan']) : '';
-$kategori = isset($_GET['kategori']) ? trim($_GET['kategori']) : '';
-$status_aktif = isset($_GET['status_aktif']);
-$status_nonaktif = isset($_GET['status_nonaktif']);
-
-$where_clauses = [];
-$where_clauses[] = "1=1";
-
-if ($search !== '') {
-    $search_safe = mysqli_real_escape_string($conn, $search);
-    $where_clauses[] = "(lokasi.kode_qris LIKE '%$search_safe%' OR lokasi.nama_lokasi LIKE '%$search_safe%')";
-}
-if ($kecamatan !== '') {
-    $kecamatan_safe = mysqli_real_escape_string($conn, $kecamatan);
-    $where_clauses[] = "lokasi.kecamatan = '$kecamatan_safe'";
-}
-if ($kategori !== '') {
-    $kategori_safe = mysqli_real_escape_string($conn, $kategori);
-    $where_clauses[] = "lokasi.kategori = '$kategori_safe'";
-}
-if ($status_aktif && !$status_nonaktif) {
-    $where_clauses[] = "lokasi.status = 'aktif'";
-} elseif (!$status_aktif && $status_nonaktif) {
-    $where_clauses[] = "lokasi.status = 'nonaktif'";
-}
-
-$where = "WHERE " . implode(" AND ", $where_clauses);
-
-// Pagination dengan filter
-$total_result = mysqli_query($conn, "SELECT COUNT(*) AS total FROM lokasi LEFT JOIN jukir_utama ON lokasi.id = jukir_utama.id_lokasi $where");
-$total_row = mysqli_fetch_assoc($total_result)['total'];
-$total_pages = ceil($total_row / $limit);
-
-$sql = "SELECT lokasi.*, jukir_utama.nama_lengkap AS nama_jukir 
-        FROM lokasi 
-        LEFT JOIN jukir_utama ON lokasi.id = jukir_utama.id_lokasi
-        $where
-        ORDER BY lokasi.id ASC
-        LIMIT $offset, $limit";
-$result = mysqli_query($conn, $sql);
+include '../api/fetch_lokasi.php';
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -71,129 +22,116 @@ $result = mysqli_query($conn, $sql);
 
         <main class="main-content">
             <div class="container" style="padding: 2rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <?php include '../components/breadcrumb.php'; ?>
+                <div class="page-header">
                     <div>
-                        <h1 style="font-size: 1.8rem; color: #2c3e50; margin: 0;">Data Lokasi Parkir</h1>
-                        <p style="color: #7f8c8d; margin-top: 5px;">Manajemen titik parkir dan target retribusi</p>
+                        <h1 class="page-title">Data Lokasi Parkir</h1>
+                        <p class="page-subtitle">Manajemen titik parkir dan target retribusi</p>
                     </div>
                     <button class="btn-primary" onclick="openTambahModal()">+ Tambah Lokasi</button>
                 </div>
 
                 <form method="GET" action="">
-                    <div class="filter-container">
-                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                            <div style="flex: 1; position: relative;">
-                                <input type="text" name="search" id="search" value="<?= htmlspecialchars($search) ?>"
-                                    placeholder="Cari Kode Lokasi atau Nama Jalan..."
-                                    style="width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid #cbd5e1; ...">
+                    <div class="filter-panel">
+                        <div class="filter-search-row">
+                            <div class="filter-search-wrapper">
+                                <span class="filter-search-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="11" cy="11" r="8" />
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                    </svg>
+                                </span>
+                                <input type="text" name="search" class="filter-search-input"
+                                    value="<?= htmlspecialchars($search) ?>"
+                                    placeholder="Cari kode QRIS atau nama lokasi..." autocomplete="off">
                             </div>
-                            <button type="submit"
-                                style="padding: 0 25px; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                                Cari Data
-                            </button>
+                            <button type="submit" class="filter-btn-search">Cari</button>
                         </div>
-                        <div
-                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                            <div>
-                                <label style="...">Kecamatan</label>
-                                <select name="kecamatan" style="...">
-                                    <option value="">Semua Kecamatan</option>
-                                    <option value="sidoarjo" <?= $kecamatan == 'sidoarjo' ? 'selected' : '' ?>>Sidoarjo
-                                        Kota</option>
-                                    <option value="waru" <?= $kecamatan == 'waru' ? 'selected' : '' ?>>Waru</option>
-                                    <option value="taman" <?= $kecamatan == 'taman' ? 'selected' : '' ?>>Taman</option>
-                                    <option value="krian" <?= $kecamatan == 'krian' ? 'selected' : '' ?>>Krian</option>
-                                    <option value="gedangan" <?= $kecamatan == 'gedangan' ? 'selected' : '' ?>>Gedangan
-                                    </option>
+                        <hr class="filter-divider">
+                        <div class="filter-controls-row">
+                            <div class="filter-field">
+                                <label for="filter-wilayah">Koordinator Wilayah</label>
+                                <select name="kecamatan" class="filter-select">
+                                    <option value="">Semua Wilayah</option>
+                                    <option value="Sidoarjo 1" <?= $kecamatan == 'Sidoarjo 1' ? 'selected' : '' ?>>Sidoarjo
+                                        1</option>
+                                    <option value="Sidoarjo 2" <?= $kecamatan == 'Sidoarjo 2' ? 'selected' : '' ?>>Sidoarjo
+                                        2</option>
+                                    <option value="Waru" <?= $kecamatan == 'Waru' ? 'selected' : '' ?>>Waru</option>
+                                    <option value="Porong" <?= $kecamatan == 'Porong' ? 'selected' : '' ?>>Porong</option>
+                                    <option value="Krian" <?= $kecamatan == 'Krian' ? 'selected' : '' ?>>Krian</option>
                                 </select>
                             </div>
-
-                            <div>
-                                <label style="...">Kategori Layanan</label>
-                                <select name="kategori" style="...">
-                                    <option value="">Semua Layanan</option>
-                                    <option value="parkir" <?= $kategori == 'parkir' ? 'selected' : '' ?>>Titik Parkir
-                                    </option>
-                                    <option value="pju" <?= $kategori == 'pju' ? 'selected' : '' ?>>Penerangan Jalan (PJU)
-                                    </option>
-                                    <option value="atcs" <?= $kategori == 'atcs' ? 'selected' : '' ?>>Titik CCTV / ATCS
-                                    </option>
-                                    <option value="terminal" <?= $kategori == 'terminal' ? 'selected' : '' ?>>Terminal /
-                                        Halte</option>
+                            <div class="filter-field">
+                                <label for="filter-titik">Titik Parkir</label>
+                                <select name="titik_parkir" id="filter-titik" class="filter-select">
+                                    <option value="">Semua Titik</option>
+                                    <option value="TJU" <?= $titik_parkir === 'TJU' ? 'selected' : '' ?>>TJU</option>
+                                    <option value="TKP" <?= $titik_parkir === 'TKP' ? 'selected' : '' ?>>TKP</option>
                                 </select>
                             </div>
-
-                            <div>
-                                <label style="...">Status</label>
-                                <div style="display: flex; gap: 10px; align-items: center; height: 40px;">
-                                    <label style="...">
-                                        <input type="checkbox" name="status_aktif" <?= $status_aktif ? 'checked' : '' ?>>
-                                        Aktif
-                                    </label>
-                                    <label style="...">
-                                        <input type="checkbox" name="status_nonaktif" <?= $status_nonaktif ? 'checked' : '' ?>> Non-Aktif
-                                    </label>
-                                </div>
-                            </div>
-
                         </div>
 
-                        <div style="margin-top: 15px; text-align: right;">
-                            <a href="../super-admin/lokasi.php"
-                                style="background: none; border: none; color: #ef4444; font-size: 0.85rem; font-weight: 500; cursor: pointer; text-decoration: underline;">
-                                Reset Filter
-                            </a>
+                        <div class="filter-footer">
+                            <p class="filter-result-info">
+                                Menampilkan <strong>
+                                    <?= number_format($total_row) ?>
+                                </strong> lokasi
+                                <?php if ($search !== '' || $kecamatan !== '' || $titik_parkir !== ''): ?>
+                                    <span class="filter-active-badge">Filter aktif</span>
+                                <?php endif; ?>
+                            </p>
+                            <a href="lokasi.php" class="filter-btn-reset">↺ Reset</a>
                         </div>
                     </div>
                 </form>
 
-                <div class="table-container"
-                    style="background: #fff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead style="background: #f8f9fa;">
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead>
                             <tr>
-                                <th style="padding: 15px; text-align: left;">Foto</th>
-                                <th style="padding: 15px; text-align: left;">Kode QRIS</th>
-                                <th style="padding: 15px; text-align: left;">Nama Lokasi</th>
-                                <th style="padding: 15px; text-align: left;">Jukir Utama</th>
-                                <th style="padding: 15px; text-align: left;">Target</th>
-                                <th style="padding: 15px; text-align: center;">Aksi</th>
+                                <th>Foto</th>
+                                <th>Kode QRIS</th>
+                                <th>Nama Lokasi</th>
+                                <th class="col-hide-mobile">Jukir Utama</th>
+                                <th>Target</th>
+                                <th style="text-align:center;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (mysqli_num_rows($result) > 0): ?>
                                 <?php while ($row = mysqli_fetch_assoc($result)): ?>
-                                    <tr style="border-top: 1px solid #eee;">
-                                        <td style="padding: 15px;">
-                                            <?php
-                                            $foto = !empty($row['foto']) ? '../assets/img/lokasi/' . $row['foto'] : '../assets/img/no-image.jpg';
-                                            ?>
-                                            <img src="<?= $foto ?>"
-                                                style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                                    <tr>
+                                        <td>
+                                            <?php $foto = !empty($row['foto']) ? '../assets/img/lokasi/' . $row['foto'] : '../assets/img/no-image.jpg'; ?>
+                                            <img src="<?= $foto ?>" class="img-thumbnail">
                                         </td>
-                                        <td style="padding: 15px; font-weight: bold;"><?= $row['kode_qris'] ?></td>
-                                        <td style="padding: 15px;">
-                                            <?= $row['nama_lokasi'] ?><br>
-                                            <small style="color: #95a5a6;"><?= $row['titik_parkir'] ?></small>
+                                        <td style="font-weight:600; font-size:0.82rem;"><?= $row['kode_qris'] ?></td>
+                                        <td>
+                                            <?= htmlspecialchars($row['nama_lokasi']) ?>
+                                            <span class="label-ptk"><?= $row['titik_parkir'] ?></span>
                                         </td>
-                                        <td style="padding: 15px;">
-                                            <?= $row['nama_jukir'] ?? '<span style="color:#bdc3c7">Belum diset</span>' ?>
+                                        <td class="col-hide-mobile">
+                                            <?= $row['nama_jukir'] ?? '<span class="no-data">Belum diset</span>' ?>
                                         </td>
-                                        <td style="padding: 15px; color: #27ae60; font-weight: bold;">
+                                        <td class="text-nominal">
                                             Rp <?= number_format($row['target_bulanan'], 0, ',', '.') ?>
                                         </td>
-                                        <td style="padding: 15px; text-align: center;">
+                                        <td style="text-align:center;">
                                             <button class="btn-action btn-edit"
                                                 onclick='openEditModal(<?= json_encode($row) ?>)'>Edit</button>
-                                            <a href="../store/hapus_lokasi.php?id=<?= $row['id'] ?>" class="btn-action btn-delete"
-                                                onclick="return confirm('Hapus lokasi ini?')">Hapus</a>
+                                            <a href="../store/proses_lokasi.php?action=delete&id=<?= $row['id'] ?>"
+                                                class="btn-action btn-delete"
+                                                onclick="return konfirmasiHapus(event, this.href)">Hapus</a>
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="6" style="padding: 30px; text-align: center; color: #95a5a6;">Data tidak
-                                        ditemukan.</td>
+                                    <td colspan="6" style="padding:40px; text-align:center; color:#94a3b8;">
+                                        Data tidak ditemukan.
+                                    </td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -204,9 +142,7 @@ $result = mysqli_query($conn, $sql);
                     $query_params = http_build_query([
                         'search' => $search,
                         'kecamatan' => $kecamatan,
-                        'kategori' => $kategori,
-                        'status_aktif' => $status_aktif ? '1' : '',
-                        'status_nonaktif' => $status_nonaktif ? '1' : '',
+                        'titik_parkir' => $titik_parkir,
                     ]);
                     for ($i = 1; $i <= $total_pages; $i++): ?>
                         <a href="?page=<?= $i ?>&<?= $query_params ?>" class="<?= ($page == $i) ? 'active' : '' ?>">
@@ -272,8 +208,14 @@ $result = mysqli_query($conn, $sql);
                     <div style="display: flex; gap: 15px;">
                         <div class="form-group" style="flex: 1;">
                             <label>Nominal Retribusi (Rp)</label>
-                            <input type="number" name="nominal_retribusi" id="nominal_retribusi" class="form-control"
-                                required>
+                            <!-- <input type="number" name="nominal_retribusi" id="nominal_retribusi" class="form-control"
+                                required> -->
+                            <select name="nominal_retribusi" id="nominal_retribusi" class="form-control">
+                                <option value="2000">Rp2.000,00</option>
+                                <option value="3000">Rp3.000,00</option>
+                                <option value="4000">Rp4.000,00</option>
+                                <option value="5000">Rp5.000,00</option>
+                            </select>
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label>Target Bulanan (Rp)</label>
@@ -346,6 +288,8 @@ $result = mysqli_query($conn, $sql);
             document.getElementById('id_field').value = '';
             document.getElementById('info_foto').style.display = 'none';
             modal.style.display = 'flex';
+
+            initMapPicker();
         }
 
         function openEditModal(data) {
@@ -380,11 +324,51 @@ $result = mysqli_query($conn, $sql);
             modal.style.display = 'none';
         }
 
-        window.onclick = function (event) {
-            if (event.target == modal) {
+        window.addEventListener('click', function (event) {
+            if (event.target === modal) {
                 closeModal();
             }
-        }
+        });
+
+        (function () {
+            const params = new URLSearchParams(window.location.search);
+            const status = params.get('status');
+            const msg = params.get('msg');
+
+            if (!status) return;
+            const url = new URL(window.location);
+            url.searchParams.delete('status');
+            url.searchParams.delete('msg');
+            window.history.replaceState({}, '', url);
+
+            const toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+            });
+
+            if (status === 'success') {
+                toast.fire({ icon: 'success', title: 'Data lokasi berhasil disimpan!' });
+            } else if (status === 'delete') {
+                toast.fire({ icon: 'success', title: 'Data lokasi berhasil dihapus!' });
+            } else if (status === 'error') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal menyimpan',
+                    text: msg || 'Terjadi kesalahan pada server.',
+                    confirmButtonColor: '#2563eb',
+                });
+            }
+
+            if (status) {
+                const url = new URL(window.location);
+                url.searchParams.delete('status');
+                url.searchParams.delete('msg');
+                window.history.replaceState({}, '', url);
+            }
+        })();
     </script>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
