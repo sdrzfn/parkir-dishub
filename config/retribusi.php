@@ -3,6 +3,7 @@ require_once __DIR__ . '/db.php';
 
 /**
  * Ringkasan keuangan
+ * @param mysqli $conn
  */
 function getGlobalFinanceSummary($conn)
 {
@@ -10,8 +11,9 @@ function getGlobalFinanceSummary($conn)
     $tahun = date('Y');
 
     $sql = "SELECT 
-                SUM(j.target_bulanan) as total_target,
-                COALESCE(SUM(t.jumlah_setoran), 0) as total_realisasi
+                SUM(j.target_bulanan)                        AS total_target,
+                SUM(j.target_bulanan) * 12                   AS target_tahunan,
+                COALESCE(SUM(t.jumlah_setoran), 0)           AS total_realisasi
             FROM jukir_utama j
             LEFT JOIN transaksi_retribusi t ON j.id = t.id_jukir 
                 AND t.bulan = '$bulan' 
@@ -20,14 +22,30 @@ function getGlobalFinanceSummary($conn)
     $result = mysqli_query($conn, $sql);
     $data = mysqli_fetch_assoc($result);
 
+    // Realisasi tahunan — query terpisah karena harus SUM semua bulan di tahun ini
+    $q_tahunan = mysqli_query($conn, "SELECT COALESCE(SUM(jumlah_setoran), 0) AS total_tahunan
+                                      FROM transaksi_retribusi
+                                      WHERE tahun = '$tahun'");
+    $data['total_realisasi_tahunan'] = mysqli_fetch_assoc($q_tahunan)['total_tahunan'] ?? 0;
+
+    // Kalkulasi bulanan
     $data['selisih'] = $data['total_target'] - $data['total_realisasi'];
-    $data['persentase'] = ($data['total_target'] > 0) ? ($data['total_realisasi'] / $data['total_target']) * 100 : 0;
+    $data['persentase'] = ($data['total_target'] > 0)
+        ? ($data['total_realisasi'] / $data['total_target']) * 100
+        : 0;
+
+    // Kalkulasi tahunan
+    $data['selisih_tahunan'] = $data['target_tahunan'] - $data['total_realisasi_tahunan'];
+    $data['persentase_tahunan'] = ($data['target_tahunan'] > 0)
+        ? ($data['total_realisasi_tahunan'] / $data['target_tahunan']) * 100
+        : 0;
 
     return $data;
 }
 
 /**
  * Total retribusi
+ * @param mysqli $conn
  */
 function getJukirPerformance($conn)
 {
@@ -50,6 +68,7 @@ function getJukirPerformance($conn)
 
 /**
  * Helper warna berdasarkan persentase
+ * @param float $persen
  */
 function getIndicator($persen)
 {
@@ -60,11 +79,23 @@ function getIndicator($persen)
     return ['color' => '#10b981', 'bg' => 'bg-green-500', 'status' => 'Tercapai'];
 }
 
+/**
+ * Menghitung tunggakan
+ * @param float $realisasi
+ * @param float $target
+ * @return float
+ */
 function hitungTunggakan($realisasi, $target)
 {
     return $target - $realisasi;
 }
 
+/**
+ * Rekomendasi Aksi
+ * @param float|int $persen
+ * @param int $hari_ini
+ * @return array|null
+ */
 function getRekomendasiAksi($persen, $hari_ini)
 {
     if ($persen < 50 && $hari_ini > 20) {
@@ -77,6 +108,10 @@ function getRekomendasiAksi($persen, $hari_ini)
 
 filterSetoran($conn);
 
+/**
+ * Filter setoran
+ * @param mysqli $conn
+ */
 function filterSetoran($conn)
 {
     $filter_bulan = isset($_GET['bulan']) ? mysqli_real_escape_string($conn, $_GET['bulan']) : date('m');
@@ -102,39 +137,56 @@ function filterSetoran($conn)
         $q_history = mysqli_query($conn, $query_base);
         if (mysqli_num_rows($q_history) > 0) {
             while ($h = mysqli_fetch_assoc($q_history)) {
-                $tgl = date('d/m/Y', strtotime($h['tanggal_setoran']));
+                $tgl = date('d M Y', strtotime($h['tanggal_setoran']));
                 $nominal = number_format($h['jumlah_setoran'], 0, ',', '.');
+                $metode = strtoupper($h['metode_pembayaran'] ?? 'TUNAI');
                 echo "
             <tr>
-                <td style='padding: 15px; font-weight: 500; color: #334155; font-size: 14px;'>$tgl</td>
-                <td style='padding: 15px;'>
-                    <span style='background: #f1f5f9; padding: 4px 10px; border-radius: 6px; font-size: 12px; color: #475569; font-weight: 600;'>
+                <td data-label='Tanggal' style='padding:14px 20px; font-weight:500; color:#334155; font-size:14px;'>$tgl</td>
+                <td data-label='Termin' style='padding:14px 20px;'>
+                    <span style='background:#f1f5f9; padding:4px 12px; border-radius:999px; font-size:12px; color:#475569; font-weight:600;'>
                         Termin {$h['termin']}
                     </span>
                 </td>
-                <td style='padding: 15px; text-transform: uppercase; font-size: 12px; font-weight: bold; color: #64748b;'>
-                    {$h['metode_pembayaran']}
+                <td data-label='Metode' style='padding:14px 20px;'>
+                    <span style='background:#e0e7ff; padding:4px 12px; border-radius:999px; font-size:12px; color:#4f46e5; font-weight:600;'>
+                        $metode
+                    </span>
                 </td>
-                <td style='padding: 15px; text-align: right; font-weight: 700; color: #1e293b; font-size: 14px;'>
+                <td data-label='Nominal' style='padding:14px 20px; text-align:right; font-weight:700; color:#1e1b4b; font-size:14px;'>
                     Rp $nominal
                 </td>
-                <td style='padding: 15px; text-align: center;'>
-                    <button type='button' class='btn-edit' 
-                        style='background: #3b82f6; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;'
-                        data-id='{$h['id']}' 
-                        data-id_jukir='{$h['id_jukir']}'
-                        data-tanggal='{$h['tanggal_setoran']}'
-                        data-termin='{$h['termin']}'
-                        data-metode='{$h['metode_pembayaran']}'
-                        data-nominal='{$h['jumlah_setoran']}'
-                        onclick='openEditModal(this)'>
-                        Edit
-                    </button>
+                <td data-label='Aksi' style='padding:14px 20px; text-align:center;'>
+                    <div style='display:flex; gap:6px; justify-content:flex-end;'>
+                        <button type='button' class='btn-action btn-edit'
+                            data-id='{$h['id']}'
+                            data-id_jukir='{$h['id_jukir']}'
+                            data-tanggal='{$h['tanggal_setoran']}'
+                            data-termin='{$h['termin']}'
+                            data-metode='{$h['metode_pembayaran']}'
+                            data-nominal='{$h['jumlah_setoran']}'
+                            onclick='openEditModal(this)'>
+                            <i class='fas fa-pencil-alt' style='font-size:11px;'></i> Edit
+                        </button>
+                        <button type='button' class='btn-action btn-delete'
+                            data-id='{$h['id']}'
+                            data-nominal='Rp $nominal'
+                            data-tgl='$tgl'
+                            onclick='hapusSetoran(this)'>
+                            <i class='fas fa-trash' style='font-size:11px;'></i>
+                        </button>
+                    </div>
                 </td>
             </tr>";
             }
         } else {
-            echo "<tr><td colspan='5' style='padding: 40px; text-align: center; color: #94a3b8;'>Tidak ada transaksi pada periode ini.</td></tr>";
+            echo "<tr><td colspan='5'>
+                <div class='empty-state'>
+                    <div class='empty-state-icon'><i class='fas fa-receipt'></i></div>
+                    <p class='empty-state-title'>Belum ada transaksi</p>
+                    <p class='empty-state-desc'>Tidak ada riwayat setoran pada periode yang dipilih.</p>
+                </div>
+            </td></tr>";
         }
         exit;
     }
@@ -142,8 +194,12 @@ function filterSetoran($conn)
 
 /**
  * Fungsi menghitung denda jika realisasi kurang dari target
+ * @param float|int $target
+ * @param float|int $realisasi
+ * @return float|int
  */
-function hitungDenda($target, $realisasi) {
+function hitungDenda($target, $realisasi)
+{
     if ($realisasi >= $target) {
         return 0;
     }
@@ -153,7 +209,10 @@ function hitungDenda($target, $realisasi) {
 
 /**
  * Fungsi menghitung bagi hasil / imbal jasa jukir 40%
+ * @param float|int $realisasi
+ * @return float|int
  */
-function hitungImbalJasa($realisasi) {
+function hitungImbalJasa($realisasi)
+{
     return 0.40 * $realisasi; // 40% dari total pendapatan yang disetor
 }

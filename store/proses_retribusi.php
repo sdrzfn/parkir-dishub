@@ -6,7 +6,11 @@ include '../config/helper.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_jukir = mysqli_real_escape_string($conn, $_POST['id_jukir']);
     $jumlah = mysqli_real_escape_string($conn, $_POST['jumlah']);
-    $termin = mysqli_real_escape_string($conn, $_POST['termin']);
+    $id_karcis = mysqli_real_escape_string($conn, $_POST['id_karcis'] ?? '');
+    $no_seri_awal = mysqli_real_escape_string($conn, $_POST['no_seri_awal'] ?? '');
+    $no_seri_akhir = mysqli_real_escape_string($conn, $_POST['no_seri_akhir'] ?? '');
+    $jumlah_karcis = (int) ($_POST['jumlah_karcis'] ?? 0);
+    $jenis_kendaraan = mysqli_real_escape_string($conn, $_POST['jenis_kendaraan'] ?? '');
     $tanggal = mysqli_real_escape_string($conn, $_POST['tanggal']);
     $time = strtotime($tanggal);
     $bulan = date('m', $time);
@@ -32,13 +36,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 tanggal_setoran = '$tanggal', 
                 termin = '$termin', 
                 bulan = '$bulan', 
-                tahun = '$tahun' 
+                tahun = '$tahun',
+                id_karcis       = '$id_karcis',
+                no_seri_awal    = '$no_seri_awal',
+                no_seri_akhir   = '$no_seri_akhir',
+                jumlah_karcis   = '$jumlah_karcis',
+                jenis_kendaraan = '$jenis_kendaraan'
                 WHERE id = '$id_setoran'";
     } else {
-        $sql = "INSERT INTO transaksi_retribusi (id_jukir, jumlah_setoran, tanggal_setoran, metode_pembayaran, termin, bulan, tahun, keterangan) 
-                VALUES ('$id_jukir', '$jumlah', '$tanggal', 'tunai', '$termin', '$bulan', '$tahun', 'Input Manual Admin')";
+        $sql = "INSERT INTO transaksi_retribusi
+                    (id_jukir, jumlah_setoran, tanggal_setoran, metode_pembayaran,
+                     bulan, tahun, keterangan,
+                     id_karcis, no_seri_awal, no_seri_akhir, jumlah_karcis, jenis_kendaraan)
+                VALUES
+                    ('$id_jukir', '$jumlah', '$tanggal', 'tunai',
+                     '$bulan', '$tahun', 'Input Manual Admin',
+                     '$id_karcis', '$no_seri_awal', '$no_seri_akhir',
+                     '$jumlah_karcis', '$jenis_kendaraan')";
     }
-    
+
     $aksi = isset($_POST['id_setoran']) && !empty($_POST['id_setoran']) ? 'edit' : 'tambah';
     if (mysqli_query($conn, $sql)) {
         redirectBack('retribusi-detail.php', ['id' => $id_jukir, 'status' => $aksi]);

@@ -26,15 +26,14 @@ $total_bendahara = mysqli_query($conn, "SELECT COUNT(*) as total FROM users WHER
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-slate-50 flex">
+<body class="font-sans text-slate-800 antialiased min-h-screen pt-24" style="background: radial-gradient(100% 100% at 100% 0%, #fef3c7 0%, #f8fafc 100%);">
 
     <?php include '../components/navbar.php'; ?>
 
-    <div class="app-body">
-        <?php include '../components/sidebar.php'; ?>
+    <main class="container mx-auto" style="max-width:1400px;">
+        <?php include '../components/breadcrumb.php'; ?>
 
-        <main class="main-content">
-            <div class="max-w-6xl mx-auto">
+        <div class="max-w-6xl mx-auto">
 
                 <div class="flex justify-between items-end mb-8">
                     <div>
@@ -115,7 +114,7 @@ $total_bendahara = mysqli_query($conn, "SELECT COUNT(*) as total FROM users WHER
                     </table>
                 </div>
             </div>
-        </main>
+
     </div>
 
     <div id="userModal"

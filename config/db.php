@@ -1,14 +1,6 @@
 <?php
-
-    $host = "localhost";
-    $user = "root";
-    $pass = "";
-    $db = "parkir_dishub";
-
-    $conn = new mysqli($host, $user, $pass, $db);
-
-    if ($conn -> connect_error) {
-        die("koneksi gagal". $conn-> connect_error);
-    }
-
+$conn = new mysqli("127.0.0.1", "root", "", "parkir_dishub", 3306);
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
+}
 ?>

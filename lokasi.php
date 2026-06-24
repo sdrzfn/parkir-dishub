@@ -13,15 +13,11 @@ include 'api/fetch_lokasi.php';
 
 <?php include 'components/header.php'; ?>
 
-<body>
+<body class="font-sans text-slate-800 antialiased min-h-screen pt-24" style="background: radial-gradient(100% 100% at 100% 0%, #fef3c7 0%, #f8fafc 100%);">
 
     <?php include 'components/navbar.php'; ?>
 
-    <div class="app-body" style="flex: 1;">
-        <?php include 'components/sidebar.php'; ?>
-
-        <main class="main-content">
-            <div class="container" style="padding: 2rem;">
+    <main class="container mx-auto" style="max-width:1400px;">
                 <?php include 'components/breadcrumb.php'; ?>
                 <div class="page-header">
                     <div>
@@ -87,15 +83,15 @@ include 'api/fetch_lokasi.php';
                     </div>
                 </form>
 
-                <div class="table-container">
-                    <table class="custom-table">
+                <div class="table-container relative max-h-[65vh] overflow-y-auto overflow-x-auto w-full rounded-xl border border-slate-200 shadow-sm mt-4">
+                    <table class="custom-table w-full whitespace-nowrap">
                         <thead>
                             <tr>
                                 <th>Foto</th>
-                                <th>Kode QRIS</th>
-                                <th>Nama Lokasi</th>
+                                <th class="hidden md:table-cell">Kode QRIS</th>
+                                <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Lokasi</th>
                                 <th class="col-hide-mobile">Jukir Utama</th>
-                                <th>Target</th>
+                                <th class="hidden md:table-cell">Target</th>
                                 <th style="text-align:center;">Aksi</th>
                             </tr>
                         </thead>
@@ -103,22 +99,26 @@ include 'api/fetch_lokasi.php';
                             <?php if (mysqli_num_rows($result) > 0): ?>
                                 <?php while ($row = mysqli_fetch_assoc($result)): ?>
                                     <tr>
-                                        <td>
+                                        <td data-label="Foto">
                                             <?php $foto = !empty($row['foto']) ? 'assets/img/lokasi/' . $row['foto'] : 'assets/img/no-image.jpg'; ?>
                                             <img src="<?= $foto ?>" class="img-thumbnail">
                                         </td>
-                                        <td style="font-weight:600; font-size:0.82rem;"><?= $row['kode_qris'] ?></td>
-                                        <td>
-                                            <?= htmlspecialchars($row['nama_lokasi']) ?>
+                                        <td data-label="Kode QRIS" class="hidden md:table-cell" style="font-weight:600; font-size:0.82rem;"><?= $row['kode_qris'] ?></td>
+                                        <td data-label="Nama Lokasi" class="sticky left-0 bg-white z-10 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">
+                                            <div class="truncate max-w-[200px]" title="<?= htmlspecialchars($row['nama_lokasi']) ?>">
+                                                <?= htmlspecialchars($row['nama_lokasi']) ?>
+                                            </div>
                                             <span class="label-ptk"><?= $row['titik_parkir'] ?></span>
                                         </td>
-                                        <td class="col-hide-mobile">
-                                            <?= $row['nama_jukir'] ?? '<span class="no-data">Belum diset</span>' ?>
+                                        <td data-label="Nama Jukir" class="col-hide-mobile">
+                                            <div class="truncate max-w-[150px]" title="<?= htmlspecialchars($row['nama_jukir'] ?? 'Belum diset') ?>">
+                                                <?= $row['nama_jukir'] ?? '<span class="no-data">Belum diset</span>' ?>
+                                            </div>
                                         </td>
-                                        <td class="text-nominal">
+                                        <td data-label="Target Bulanan" class="text-nominal hidden md:table-cell">
                                             Rp <?= number_format($row['target_bulanan'], 0, ',', '.') ?>
                                         </td>
-                                        <td style="text-align:center;">
+                                        <td data-label="Aksi" style="text-align:center;">
                                             <button class="btn-action btn-edit"
                                                 onclick='openEditModal(<?= json_encode($row) ?>)'>Edit</button>
                                             <a href="store/proses_lokasi.php?action=delete&id=<?= $row['id'] ?>"
@@ -137,31 +137,53 @@ include 'api/fetch_lokasi.php';
                         </tbody>
                     </table>
                 </div>
-                <div class="pagination">
-                    <?php
-                    $query_params = http_build_query([
-                        'search' => $search,
-                        'kecamatan' => $kecamatan,
-                        'titik_parkir' => $titik_parkir,
-                    ]);
-                    for ($i = 1; $i <= $total_pages; $i++): ?>
-                        <a href="?page=<?= $i ?>&<?= $query_params ?>" class="<?= ($page == $i) ? 'active' : '' ?>">
-                            <?= $i ?>
+                <div class="flex items-center justify-between mt-6 px-4">
+                    <p class="text-sm text-slate-500">
+                        Menampilkan halaman <span class="font-medium text-slate-900"><?= $page ?></span> dari <span class="font-medium text-slate-900"><?= max(1, $total_pages) ?></span>
+                    </p>
+                    <nav class="flex items-center gap-2" aria-label="Pagination">
+                        <?php
+                        $query_params = http_build_query([
+                            'search' => $search,
+                            'kecamatan' => $kecamatan,
+                            'titik_parkir' => $titik_parkir,
+                        ]);
+                        ?>
+                        
+                        <!-- Previous Button -->
+                        <a href="<?= $page > 1 ? '?page=' . ($page - 1) . '&' . $query_params : '#' ?>" 
+                           class="px-3 py-2 rounded-lg text-sm font-medium transition-colors <?= $page > 1 ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed pointer-events-none' ?>"
+                           aria-disabled="<?= $page <= 1 ? 'true' : 'false' ?>">
+                            &larr; Sebelumnya
                         </a>
-                    <?php endfor; ?>
+
+                        <!-- Page Numbers -->
+                        <div class="flex items-center gap-1 hidden sm:flex">
+                            <?php for ($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++): ?>
+                                <a href="?page=<?= $i ?>&<?= $query_params ?>" 
+                                   class="w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors <?= ($page == $i) ? 'bg-brand-950 text-white' : 'text-slate-600 hover:bg-slate-100' ?>">
+                                    <?= $i ?>
+                                </a>
+                            <?php endfor; ?>
+                        </div>
+
+                        <!-- Next Button -->
+                        <a href="<?= $page < $total_pages ? '?page=' . ($page + 1) . '&' . $query_params : '#' ?>" 
+                           class="px-3 py-2 rounded-lg text-sm font-medium transition-colors <?= $page < $total_pages ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed pointer-events-none' ?>"
+                           aria-disabled="<?= $page >= $total_pages ? 'true' : 'false' ?>">
+                            Selanjutnya &rarr;
+                        </a>
+                    </nav>
                 </div>
-            </div>
-        </main>
-    </div>
+    </main>
 
     <div id="modalLokasi" class="modal">
         <div class="modal-content">
+            <button type="button" onclick="closeModal()" class="btn-close-modal" aria-label="Tutup Modal"><i class="fas fa-times"></i></button>
             <form id="formLokasi" action="store/proses_lokasi.php?action=add" method="POST"
                 enctype="multipart/form-data">
-                <div
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                    <h3 id="modalTitle" style="margin: 0;">Tambah Lokasi Parkir</h3>
-                    <span onclick="closeModal()" style="cursor:pointer; font-size: 24px; color: #95a5a6;">&times;</span>
+                <div class="modal-header">
+                    <h3 id="modalTitle" style="margin: 0; font-weight: 700; color: var(--text-main);">Tambah Lokasi Parkir</h3>
                 </div>
 
                 <div class="modal-body">
@@ -242,8 +264,7 @@ include 'api/fetch_lokasi.php';
                     </div>
                 </div>
 
-                <div
-                    style="margin-top: 25px; border-top: 1px solid #eee; padding-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <div class="modal-footer">
                     <button type="button" class="btn-secondary" onclick="closeModal()">Batal</button>
                     <button type="submit" class="btn-primary">Simpan Data</button>
                 </div>

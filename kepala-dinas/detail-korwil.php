@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 include '../config/db.php';
 include '../config/auth.php';
 checkLogin();
@@ -12,14 +12,14 @@ include '../api/fetch_korwil.php';
 <html lang="id">
 <?php include '../components/header.php'; ?>
 
-<body style="display: flex; margin: 0;">
+<body class="font-sans text-slate-800 antialiased min-h-screen pt-24" style="background: radial-gradient(100% 100% at 100% 0%, #fef3c7 0%, #f8fafc 100%);">
     <?php include '../components/navbar.php'; ?>
 
-    <div class="app-body" style="flex: 1;">
-        <?php include '../components/sidebar.php'; ?>
+    <main class="container mx-auto" style="max-width:1400px;">
 
-        <main class="main-content">
-            <div class="container">
+
+
+
                 <a href="koordinator-wilayah.php"
                     style="text-decoration: none; color: var(--primary); font-size: 0.9rem;">← Kembali ke Daftar</a>
 
@@ -79,7 +79,7 @@ include '../api/fetch_korwil.php';
                     </table>
                 </div>
             </div>
-        </main>
+
     </div>
 </body>
 
