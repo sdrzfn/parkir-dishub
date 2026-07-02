@@ -94,6 +94,17 @@ $_foto_file = $u_foto['foto'] ?? '';
 $foto_path = (!empty($_foto_file) && file_exists('assets/img/users/' . $_foto_file))
     ? 'assets/img/users/' . $_foto_file
     : 'assets/img/default-avatar.png';
+
+$q_live_feed = mysqli_query($conn, "SELECT 
+                                        tr.tanggal_setoran, 
+                                        tr.jumlah_setoran, 
+                                        l.nama_lokasi,
+                                        tr.metode_pembayaran
+                                    FROM transaksi_retribusi tr
+                                    INNER JOIN jukir_utama ju ON tr.id_jukir = ju.id
+                                    INNER JOIN lokasi l ON ju.id_lokasi = l.id
+                                    ORDER BY tr.tanggal_setoran DESC, tr.id DESC 
+                                    LIMIT 5");
 ?>
 
 <!DOCTYPE html>
@@ -139,7 +150,7 @@ $foto_path = (!empty($_foto_file) && file_exists('assets/img/users/' . $_foto_fi
             <!-- 4 Financial Cards (Premium Aesthetics) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-2">
                 
-                <!-- Target -->
+                <!-- Target Bulanan -->
                 <div class="group relative bg-white rounded-[20px] p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(59,130,246,0.12)] transition-all duration-300 hover:-translate-y-1 overflow-hidden">
                     <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="relative z-10">
@@ -162,7 +173,7 @@ $foto_path = (!empty($_foto_file) && file_exists('assets/img/users/' . $_foto_fi
                     <div class="relative z-10">
                         <div class="flex justify-between items-start mb-4">
                             <div>
-                                <h3 class="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-1">Realisasi</h3>
+                                <h3 class="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-1">Realisasi Bulan Ini</h3>
                             </div>
                             <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
                                 <i class="fas fa-wallet text-lg"></i>
@@ -272,7 +283,6 @@ $foto_path = (!empty($_foto_file) && file_exists('assets/img/users/' . $_foto_fi
                         <p class="text-3xl font-black text-white tracking-tight"><?= round($summary['persentase_tahunan'], 1) ?><span class="text-base text-white/70 font-semibold ml-1">%</span></p>
                     </div>
                 </div>
-                
             </div>
         </div>
 
@@ -308,30 +318,31 @@ $foto_path = (!empty($_foto_file) && file_exists('assets/img/users/' . $_foto_fi
                         <i class="fas fa-medal text-[14px] text-brand-500"></i>
                     </div>
                     <div class="flex flex-col flex-1 overflow-y-auto pr-2" style="scrollbar-width: thin;">
-                        <?php if (empty($top_jukir_data)): ?>
-                                <div class="text-center text-slate-400 text-sm mt-10">Belum ada data setoran bulan ini.</div>
+                        <?php if(empty($top_jukir_data)): ?>
+                            <div class="text-center text-slate-400 text-sm mt-10">Belum ada data setoran bulan ini.</div>
                         <?php else: ?>
-                                <?php foreach ($top_jukir_data as $idx => $tj): ?>
-                                        <div class="flex items-center gap-3 py-2.5 border-b border-slate-50 last:border-0">
-                                            <div class="w-7 h-7 rounded-full bg-<?= $idx === 0 ? 'amber-100 text-amber-600' : ($idx === 1 ? 'slate-200 text-slate-500' : ($idx === 2 ? 'orange-100 text-orange-700' : 'brand-50 text-brand-600')) ?> flex items-center justify-center flex-shrink-0 font-bold text-xs">
-                                                <?= $idx + 1 ?>
-                                            </div>
-                                            <div class="flex-1 min-w-0">
-                                                <p class="text-[13px] font-semibold text-slate-800 truncate leading-tight"><?= htmlspecialchars(ucwords($tj['jukir'])) ?></p>
-                                                <p class="text-[11px] text-slate-500 truncate"><?= htmlspecialchars($tj['lokasi']) ?></p>
-                                            </div>
-                                            <div class="text-right">
-                                                <p class="text-[13px] font-bold text-slate-800">Rp <?= number_format($tj['total'], 0, ',', '.') ?></p>
-                                            </div>
-                                        </div>
-                                <?php endforeach; ?>
+                            <?php foreach($top_jukir_data as $idx => $tj): ?>
+                                <div class="flex items-center gap-3 py-2.5 border-b border-slate-50 last:border-0">
+                                    <div class="w-7 h-7 rounded-full bg-<?= $idx === 0 ? 'amber-100 text-amber-600' : ($idx === 1 ? 'slate-200 text-slate-500' : ($idx === 2 ? 'orange-100 text-orange-700' : 'brand-50 text-brand-600')) ?> flex items-center justify-center flex-shrink-0 font-bold text-xs">
+                                        <?= $idx + 1 ?>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-[13px] font-semibold text-slate-800 truncate leading-tight"><?= htmlspecialchars(ucwords($tj['jukir'])) ?></p>
+                                        <p class="text-[11px] text-slate-500 truncate"><?= htmlspecialchars($tj['lokasi']) ?></p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-[13px] font-bold text-slate-800">Rp <?= number_format($tj['total'], 0, ',', '.') ?></p>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
                 </div>
             </div>
+        </div>
 
             <!-- Tier 3, Column 1: Peta Sebaran Titik Parkir (Span 8) -->
-            <div class="col-span-12 md:col-span-7 lg:col-span-8">
+            <div class="col-span-12 md:col-span-7 lg:col-span-8" style="margin-top: 2rem;">
                 <div class="bg-white rounded-[16px] p-5 border border-[rgba(0,0,0,0.06)] shadow-floating flex flex-col" style="height: clamp(280px, 40vw, 380px);">
                     <div class="flex justify-between items-center mb-4">
                         <div>
@@ -346,7 +357,7 @@ $foto_path = (!empty($_foto_file) && file_exists('assets/img/users/' . $_foto_fi
             </div>
 
             <!-- Tier 3, Column 2: Progress Target Per Korwil (Span 4) -->
-            <div class="col-span-12 md:col-span-5 lg:col-span-4">
+            <!-- <div class="col-span-12 md:col-span-5 lg:col-span-4">
                 <div class="bg-[#1e1b4b] text-white rounded-[16px] p-5 shadow-floating flex flex-col" style="height: clamp(280px, 40vw, 380px);">
                     <div class="flex justify-between items-start mb-4">
                         <h3 class="text-[16px] font-medium">Progress Target Wilayah</h3>
@@ -354,32 +365,91 @@ $foto_path = (!empty($_foto_file) && file_exists('assets/img/users/' . $_foto_fi
                     </div>
                     
                     <div class="flex flex-col flex-1 overflow-y-auto pr-2" style="scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent;">
-                        <?php if (empty($progress_wilayah_data)): ?>
-                                <div class="text-center text-white/50 text-sm mt-10">Tidak ada data target.</div>
+                        <?php if(empty($progress_wilayah_data)): ?>
+                            <div class="text-center text-white/50 text-sm mt-10">Tidak ada data target.</div>
                         <?php else: ?>
-                                <?php foreach ($progress_wilayah_data as $pw):
-                                    $pct = $pw['target'] > 0 ? round(($pw['realisasi'] / $pw['target']) * 100) : 0;
-                                    $color = $pct >= 100 ? '#10b981' : ($pct >= 70 ? '#F5C518' : '#ef4444');
-                                    ?>
-                                        <div class="mb-4 last:mb-0">
-                                            <div class="flex justify-between items-center mb-1">
-                                                <span class="text-[13px] font-medium text-white truncate"><?= htmlspecialchars(ucwords($pw['kecamatan'])) ?></span>
-                                                <span class="text-[11px] font-bold text-white"><?= $pct ?>%</span>
-                                            </div>
-                                            <div class="text-[10px] text-white/50 text-right mb-1">
-                                                Rp <?= number_format($pw['realisasi'], 0, ',', '.') ?> / Rp <?= number_format($pw['target'], 0, ',', '.') ?>
-                                            </div>
-                                            <div class="w-full h-[6px] bg-white/10 rounded-full overflow-hidden">
-                                                <div class="h-full rounded-full" style="width: <?= min(100, $pct) ?>%; background-color: <?= $color ?>;"></div>
-                                            </div>
-                                        </div>
-                                <?php endforeach; ?>
+                            <?php foreach($progress_wilayah_data as $pw): 
+                                $pct = $pw['target'] > 0 ? round(($pw['realisasi'] / $pw['target']) * 100) : 0;
+                                $color = $pct >= 100 ? '#10b981' : ($pct >= 70 ? '#F5C518' : '#ef4444');
+                            ?>
+                                <div class="mb-4 last:mb-0">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-[13px] font-medium text-white truncate"><?= htmlspecialchars(ucwords($pw['kecamatan'])) ?></span>
+                                        <span class="text-[11px] font-bold text-white"><?= $pct ?>%</span>
+                                    </div>
+                                    <div class="text-[10px] text-white/50 text-right mb-1">
+                                        Rp <?= number_format($pw['realisasi'], 0, ',', '.') ?> / Rp <?= number_format($pw['target'], 0, ',', '.') ?>
+                                    </div>
+                                    <div class="w-full h-[6px] bg-white/10 rounded-full overflow-hidden">
+                                        <div class="h-full rounded-full" style="width: <?= min(100, $pct) ?>%; background-color: <?= $color ?>;"></div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
+        <div class="card" style="margin-top: 2rem; padding: 24px; background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <div>
+                    <h3 class="text-[16px] lg:text-[18px] font-medium tracking-tight text-slate-800">Log Pengawasan Publik</h3>
+                    <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.85rem;">Daftar realisasi setoran retribusi parkir terkini di wilayah Sidoarjo</p>
+                </div>
+            <div>
+                <span style="display: inline-flex; align-items: center; gap: 6px; background-color: #f0f9ff; color: #0369a1; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;">
+                    <span style="width: 8px; height: 8px; background-color: #0ea5e9; border-radius: 50%; display: inline-block; animation: pulse 2s infinite;"></span>
+                    Live Feed
+                </span>
+            </div>
         </div>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #f1f5f9; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">
+                        <th style="padding: 12px 16px;">Waktu Setor</th>
+                        <th style="padding: 12px 16px;">Titik Lokasi Parkir</th>
+                        <th style="padding: 12px 16px; text-center">Metode</th>
+                        <th style="padding: 12px 16px; text-align: right;">Nominal Setoran</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (mysqli_num_rows($q_live_feed) > 0): ?>
+                        <?php while ($feed = mysqli_fetch_assoc($q_live_feed)): 
+                            $is_qris = (strtolower($feed['metode_pembayaran']) === 'qris');
+                        ?>
+                            <tr style="border-bottom: 1px solid #f1f5f9; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8fafc'" onmouseout="this.style.backgroundColor='transparent'">
+                                <td style="padding: 14px 16px; color: #475569; font-size: 0.85rem;">
+                                    <?= date('d M Y', strtotime($feed['tanggal_setoran'])); ?>
+                                </td>
+                            
+                                <td style="padding: 14px 16px; color: #1e293b; font-weight: 500;">
+                                    <?= $feed['nama_lokasi']; ?>
+                                </td>
+
+                                <td style="padding: 14px 16px; text-align: center;">
+                                    <?php if ($is_qris): ?>
+                                        <span style="background-color: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">QRIS</span>
+                                    <?php else: ?>
+                                        <span style="background-color: #fef3c7; color: #d97706; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">TUNAI</span>
+                                    <?php endif; ?>
+                                </td>
+                            
+                                <td style="padding: 14px 16px; text-align: right; color: #16a34a; font-weight: 700; font-size: 0.95rem;">
+                                    Rp <?= number_format($feed['jumlah_setoran'], 0, ',', '.'); ?>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="4" style="padding: 20px; text-align: center; color: #94a3b8; font-style: italic;">Belum ada data transaksi setoran masuk bulan ini.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     </main>
 
