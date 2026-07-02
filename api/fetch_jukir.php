@@ -16,7 +16,7 @@ if ($search !== '') {
 
 if ($kecamatan !== '') {
     $k = mysqli_real_escape_string($conn, $kecamatan);
-    $where .= " AND koordinator_wilayah.wilayah = '$k'";
+    $where .= " AND lokasi.kecamatan = '$k'";
 }
 
 if ($titik_parkir !== '') {

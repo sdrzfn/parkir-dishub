@@ -40,6 +40,7 @@ if ($action == 'add' || $action == 'edit') {
         $nik = mysqli_real_escape_string($conn, $_POST['nik_pembantu']);
         $nama = mysqli_real_escape_string($conn, $_POST['nama_pembantu']);
         $alamat = mysqli_real_escape_string($conn, $_POST['alamat_pembantu'] ?? '');
+        $no_rekening = mysqli_real_escape_string($conn, $_POST['no_rekening_pembantu']);
 
         $foto_lama = "";
         $pks_lama = "";
@@ -58,13 +59,13 @@ if ($action == 'add' || $action == 'edit') {
         $final_pks = ($pks_baru !== null) ? $pks_baru : $pks_lama;
 
         if ($action == 'add') {
-            $sql = "INSERT INTO jukir_pembantu (id_utama, nik, nama_pembantu, alamat_pembantu, foto_id_card, file_pks) 
-                    VALUES ('$id_utama', '$nik', '$nama', '$alamat', '$final_foto', '$final_pks')";
+            $sql = "INSERT INTO jukir_pembantu (id_utama, nik, nama_pembantu, alamat_pembantu, foto_id_card, file_pks, no_rekening) 
+                    VALUES ('$id_utama', '$nik', '$nama', '$alamat', '$final_foto', '$final_pks', '$no_rekening')";
             $status = "success_add_pembantu";
         } else {
             $sql = "UPDATE jukir_pembantu SET 
                     id_utama = '$id_utama', nik = '$nik', nama_pembantu = '$nama', alamat_pembantu = '$alamat',
-                    foto_id_card = '$final_foto', file_pks = '$final_pks'
+                    foto_id_card = '$final_foto', file_pks = '$final_pks', no_rekening = '$no_rekening'
                     WHERE id = '$id_pembantu'";
             $status = "success_edit_pembantu";
         }
@@ -77,6 +78,7 @@ if ($action == 'add' || $action == 'edit') {
         $alamat = mysqli_real_escape_string($conn, $_POST['alamat']);
         $no_telp = mysqli_real_escape_string($conn, $_POST['no_telp']);
         $id_lokasi = mysqli_real_escape_string($conn, $_POST['id_lokasi']);
+        $no_rekening = mysqli_real_escape_string($conn, $_POST['no_rekening']);
 
         $foto_lama = "";
         $pks_lama = "";
@@ -95,13 +97,14 @@ if ($action == 'add' || $action == 'edit') {
         $final_pks = ($pks_baru !== null) ? $pks_baru : $pks_lama;
 
         if ($action == 'add') {
-            $sql = "INSERT INTO jukir_utama (nik, nama_lengkap, ttl, alamat, no_telp, id_lokasi, foto_id_card, file_pks) 
-                    VALUES ('$nik', '$nama', '$ttl', '$alamat', '$no_telp', '$id_lokasi', '$final_foto', '$final_pks')";
+            $sql = "INSERT INTO jukir_utama (nik, nama_lengkap, ttl, alamat, no_telp, id_lokasi, foto_id_card, file_pks, no_rekening) 
+                    VALUES ('$nik', '$nama', '$ttl', '$alamat', '$no_telp', '$id_lokasi', '$final_foto', '$final_pks', '$no_rekening')";
             $status = "success_add_utama";
         } else {
             $sql = "UPDATE jukir_utama SET 
                     nik = '$nik', nama_lengkap = '$nama', ttl = '$ttl', alamat = '$alamat', 
-                    no_telp = '$no_telp', id_lokasi = '$id_lokasi', foto_id_card = '$final_foto', file_pks = '$final_pks'
+                    no_telp = '$no_telp', id_lokasi = '$id_lokasi', foto_id_card = '$final_foto', file_pks = '$final_pks',
+                    no_rekening = '$no_rekening'
                     WHERE id = '$id'";
             $status = "success_edit_utama";
         }

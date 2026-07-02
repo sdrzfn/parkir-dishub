@@ -25,10 +25,10 @@ $result = mysqli_query($conn, $sql);
                 <h1 class="page-title">Manajemen Koordinator Wilayah</h1>
                 <p class="page-subtitle">Daftar penanggung jawab wilayah Sidoarjo</p>
             </div>
-            <button class="btn-primary" onclick="openTambahModal()"
+            <!-- <button class="btn-primary" onclick="openTambahModal()"
                 style="display: flex; align-items: center; gap: 8px;">
                 <i class="fas fa-plus"></i> Tambah Koordinator
-            </button>
+            </button> -->
         </div>
 
         <div
@@ -59,8 +59,8 @@ $result = mysqli_query($conn, $sql);
                                     </div>
                                 </td>
                                 <td data-label="Aksi" style="text-align: center;">
-                                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                        <button class="btn-action btn-edit" onclick='openEditModal(<?= json_encode($row) ?>)'
+                                    <div style="display: flex; gap: 8px; justify-content: center;">
+                                        <!-- <button class="btn-action btn-edit" onclick='openEditModal(<?= json_encode($row) ?>)'
                                             style="padding: 6px 12px; font-weight: bold;">
                                             <i class="fas fa-edit" style="margin-right: 4px;"></i> Edit
                                         </button>
@@ -68,7 +68,7 @@ $result = mysqli_query($conn, $sql);
                                             onclick="hapusData(<?= $row['id']; ?>, '<?= htmlspecialchars($row['nama_korwil']); ?>')"
                                             style="padding: 6px 12px; font-weight: bold;">
                                             <i class="fas fa-trash" style="margin-right: 4px;"></i> Hapus
-                                        </button>
+                                        </button> -->
                                         <a href="detail-korwil.php?id=<?= $row['id']; ?>" class="btn-action"
                                             style="background: #0ea5e9; color: white; padding: 6px 12px; font-weight: bold; border-radius: 6px; text-decoration: none;">
                                             <i class="fas fa-eye" style="margin-right: 4px;"></i> Detail

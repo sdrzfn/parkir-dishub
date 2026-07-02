@@ -94,6 +94,17 @@ $_foto_file = $u_foto['foto'] ?? '';
 $foto_path = (!empty($_foto_file) && file_exists('assets/img/users/' . $_foto_file))
     ? 'assets/img/users/' . $_foto_file
     : 'assets/img/default-avatar.png';
+
+$q_live_feed = mysqli_query($conn, "SELECT 
+                                        tr.tanggal_setoran, 
+                                        tr.jumlah_setoran, 
+                                        l.nama_lokasi,
+                                        tr.metode_pembayaran
+                                    FROM transaksi_retribusi tr
+                                    INNER JOIN jukir_utama ju ON tr.id_jukir = ju.id
+                                    INNER JOIN lokasi l ON ju.id_lokasi = l.id
+                                    ORDER BY tr.tanggal_setoran DESC, tr.id DESC 
+                                    LIMIT 5");
 ?>
 
 <!DOCTYPE html>
@@ -328,9 +339,10 @@ $foto_path = (!empty($_foto_file) && file_exists('assets/img/users/' . $_foto_fi
                     </div>
                 </div>
             </div>
+        </div>
 
             <!-- Tier 3, Column 1: Peta Sebaran Titik Parkir (Span 8) -->
-            <div class="col-span-12 md:col-span-7 lg:col-span-8">
+            <div class="col-span-12 md:col-span-7 lg:col-span-8" style="margin-top: 2rem;">
                 <div class="bg-white rounded-[16px] p-5 border border-[rgba(0,0,0,0.06)] shadow-floating flex flex-col" style="height: clamp(280px, 40vw, 380px);">
                     <div class="flex justify-between items-center mb-4">
                         <div>
@@ -345,7 +357,7 @@ $foto_path = (!empty($_foto_file) && file_exists('assets/img/users/' . $_foto_fi
             </div>
 
             <!-- Tier 3, Column 2: Progress Target Per Korwil (Span 4) -->
-            <div class="col-span-12 md:col-span-5 lg:col-span-4">
+            <!-- <div class="col-span-12 md:col-span-5 lg:col-span-4">
                 <div class="bg-[#1e1b4b] text-white rounded-[16px] p-5 shadow-floating flex flex-col" style="height: clamp(280px, 40vw, 380px);">
                     <div class="flex justify-between items-start mb-4">
                         <h3 class="text-[16px] font-medium">Progress Target Wilayah</h3>
@@ -376,9 +388,68 @@ $foto_path = (!empty($_foto_file) && file_exists('assets/img/users/' . $_foto_fi
                         <?php endif; ?>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
+        <div class="card" style="margin-top: 2rem; padding: 24px; background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <div>
+                    <h3 class="text-[16px] lg:text-[18px] font-medium tracking-tight text-slate-800">Log Pengawasan Publik</h3>
+                    <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.85rem;">Daftar realisasi setoran retribusi parkir terkini di wilayah Sidoarjo</p>
+                </div>
+            <div>
+                <span style="display: inline-flex; align-items: center; gap: 6px; background-color: #f0f9ff; color: #0369a1; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;">
+                    <span style="width: 8px; height: 8px; background-color: #0ea5e9; border-radius: 50%; display: inline-block; animation: pulse 2s infinite;"></span>
+                    Live Feed
+                </span>
+            </div>
         </div>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #f1f5f9; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">
+                        <th style="padding: 12px 16px;">Waktu Setor</th>
+                        <th style="padding: 12px 16px;">Titik Lokasi Parkir</th>
+                        <th style="padding: 12px 16px; text-center">Metode</th>
+                        <th style="padding: 12px 16px; text-align: right;">Nominal Setoran</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (mysqli_num_rows($q_live_feed) > 0): ?>
+                        <?php while ($feed = mysqli_fetch_assoc($q_live_feed)): 
+                            $is_qris = (strtolower($feed['metode_pembayaran']) === 'qris');
+                        ?>
+                            <tr style="border-bottom: 1px solid #f1f5f9; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8fafc'" onmouseout="this.style.backgroundColor='transparent'">
+                                <td style="padding: 14px 16px; color: #475569; font-size: 0.85rem;">
+                                    <?= date('d M Y', strtotime($feed['tanggal_setoran'])); ?>
+                                </td>
+                            
+                                <td style="padding: 14px 16px; color: #1e293b; font-weight: 500;">
+                                    <?= $feed['nama_lokasi']; ?>
+                                </td>
+
+                                <td style="padding: 14px 16px; text-align: center;">
+                                    <?php if ($is_qris): ?>
+                                        <span style="background-color: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">QRIS</span>
+                                    <?php else: ?>
+                                        <span style="background-color: #fef3c7; color: #d97706; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">TUNAI</span>
+                                    <?php endif; ?>
+                                </td>
+                            
+                                <td style="padding: 14px 16px; text-align: right; color: #16a34a; font-weight: 700; font-size: 0.95rem;">
+                                    Rp <?= number_format($feed['jumlah_setoran'], 0, ',', '.'); ?>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="4" style="padding: 20px; text-align: center; color: #94a3b8; font-style: italic;">Belum ada data transaksi setoran masuk bulan ini.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     </main>
 

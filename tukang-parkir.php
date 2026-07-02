@@ -13,34 +13,56 @@ include 'api/fetch_jukir.php';
 
 <?php include 'components/header.php'; ?>
 
-<body class="font-sans text-slate-800 antialiased min-h-screen pt-24" style="background: radial-gradient(100% 100% at 100% 0%, #fef3c7 0%, #f8fafc 100%);">
+<body class="font-sans text-slate-800 antialiased min-h-screen pt-24"
+    style="background: radial-gradient(100% 100% at 100% 0%, #fef3c7 0%, #f8fafc 100%);">
 
     <?php include 'components/navbar.php'; ?>
 
     <main class="container mx-auto" style="max-width:1400px;">
         <?php include 'components/breadcrumb.php'; ?>
-                <div class="page-header">
-                    <div>
-                        <h1 class="page-title">Data Petugas Parkir</h1>
-                        <p class="page-subtitle">Manajemen titik parkir dan target retribusi</p>
-                    </div>
-                    <button class="btn-primary" onclick="openAddModal()">+ Tambah Petugas Parkir</button>
-                </div>
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Data Petugas Parkir</h1>
+                <p class="page-subtitle">Manajemen titik parkir dan target retribusi</p>
+            </div>
+            <button class="btn-primary" onclick="openAddModal()">+ Tambah Petugas Parkir</button>
+        </div>
 
         <div class="filter-panel">
             <form method="GET" action="" class="filter-search-row">
                 <div class="filter-search-wrapper">
                     <i class="fas fa-search filter-search-icon"></i>
-                    <input type="text" name="search" class="filter-search-input" placeholder="Cari NIK atau Nama Petugas..." value="<?= htmlspecialchars($search ?? '') ?>">
+                    <input type="text" name="search" class="filter-search-input"
+                        placeholder="Cari NIK atau Nama Petugas..." value="<?= htmlspecialchars($search ?? '') ?>">
                 </div>
-                
+
                 <select name="kecamatan" class="filter-select" style="max-width: 200px;">
-                    <option value="">Semua Wilayah</option>
-                    <option value="Sidoarjo 1" <?= $kecamatan == 'Sidoarjo 1' ? 'selected' : '' ?>>Sidoarjo 1</option>
-                    <option value="Sidoarjo 2" <?= $kecamatan == 'Sidoarjo 2' ? 'selected' : '' ?>>Sidoarjo 2</option>
-                    <option value="Waru" <?= $kecamatan == 'Waru' ? 'selected' : '' ?>>Waru</option>
-                    <option value="Porong" <?= $kecamatan == 'Porong' ? 'selected' : '' ?>>Porong</option>
-                    <option value="Krian" <?= $kecamatan == 'Krian' ? 'selected' : '' ?>>Krian</option>
+                    <option value="">Semua Kecamatan</option>
+                    <?php
+                    $list_kecamatan = [
+                        'Balongbendo',
+                        'Taman',
+                        'Buduran',
+                        'Porong',
+                        'Tanggulangin',
+                        'Candi',
+                        'Prambon',
+                        'Tarik',
+                        'Gedangan',
+                        'Sedati',
+                        'Tulangan',
+                        'Jabon',
+                        'Sidoarjo',
+                        'Waru',
+                        'Krembung',
+                        'Sukodono',
+                        'Wonoayu'
+                    ];
+                    foreach ($list_kecamatan as $kec):
+                        $selected = ($kecamatan === $kec) ? 'selected' : '';
+                        echo "<option value='$kec' $selected>$kec</option>";
+                    endforeach;
+                    ?>
                 </select>
 
                 <select name="titik_parkir" class="filter-select" style="max-width: 150px;">
@@ -55,201 +77,214 @@ include 'api/fetch_jukir.php';
             </form>
         </div>
 
-                <div class="table-container relative max-h-[65vh] overflow-y-auto overflow-x-auto w-full rounded-xl border border-slate-200 shadow-sm mt-4">
-                    <table class="custom-table w-full whitespace-nowrap">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>ID Card</th>
-                                <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Petugas Utama (Klik untuk Pembantu)</th>
-                                <th class="hidden md:table-cell">NIK</th>
-                                <th class="hidden md:table-cell">No. Telp</th>
-                                <th>Lokasi Parkir</th>
-                                <th class="hidden md:table-cell">File PKS</th>
-                                <th style="text-align: center;">Aksi</th>
+        <div
+            class="table-container relative max-h-[65vh] overflow-y-auto overflow-x-auto w-full rounded-xl border border-slate-200 shadow-sm mt-4">
+            <table class="custom-table w-full whitespace-nowrap">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>ID Card</th>
+                        <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Petugas
+                            Utama (Klik untuk Pembantu)</th>
+                        <th class="hidden md:table-cell">NIK</th>
+                        <th class="hidden md:table-cell">No. Telp</th>
+                        <th>Lokasi Parkir</th>
+                        <th class="hidden md:table-cell">File PKS</th>
+                        <th style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    if (mysqli_num_rows($result) > 0):
+                        $no = $offset + 1;
+                        while ($row = mysqli_fetch_assoc($result)):
+                            $id_utama = $row['id'];
+                            $path_foto_utama = !empty($row['foto_id_card']) ? 'assets/img/jukir/utama/' . $row['foto_id_card'] : 'assets/img/no-image.jpg';
+                            $has_pks_utama = !empty($row['file_pks']);
+                            $path_pks_utama = $has_pks_utama ? 'assets/docs/pks/utama/' . $row['file_pks'] : '#';
+                            $query_pembantu = mysqli_query($conn, "SELECT * FROM jukir_pembantu WHERE id_utama = $id_utama");
+                            $jumlah_pembantu = mysqli_num_rows($query_pembantu);
+                            ?>
+                            <tr class="border-b border-gray-200 hover:bg-gray-50 bg-white">
+                                <td data-label="No" class="text-center font-medium"><?= $no++; ?></td>
+
+                                <td data-label="ID Card" class="text-center">
+                                    <img src="<?= $path_foto_utama ?>" class="img-thumbnail"
+                                        style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; cursor: pointer;"
+                                        onclick="window.open('<?= $path_foto_utama ?>', '_blank')">
+                                </td>
+
+                                <td data-label="Nama Petugas"
+                                    class="py-3 px-6 sticky left-0 bg-white z-10 shadow-[2px_0_5px_rgba(0,0,0,0.05)]"
+                                    style="font-weight: bold">
+                                    <div class="font-bold text-gray-800 truncate max-w-[200px]"
+                                        title="<?= htmlspecialchars($row['nama_lengkap']); ?>">
+                                        <?= $row['nama_lengkap']; ?>
+                                    </div>
+                                    <?php if ($jumlah_pembantu > 0): ?>
+                                        <button type="button" onclick="togglePembantuRow(<?= $id_utama ?>)"
+                                            style="margin-top: 4px; padding: 2px 8px; font-size: 11px; background-color: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 12px; font-weight: 600; cursor: pointer;">
+                                            <i class="fa fa-users"></i> Lihat <?= $jumlah_pembantu; ?> Pembantu
+                                        </button>
+                                    <?php endif; ?>
+                                </td>
+
+                                <td data-label="NIK" class="py-3 px-6 hidden md:table-cell font-mono text-sm">
+                                    <?= $row['nik']; ?></td>
+                                <td data-label="No. Telp" class="py-3 px-6 hidden md:table-cell"><?= $row['no_telp']; ?></td>
+                                <td data-label="Lokasi Parkir" class="py-3 px-6">
+                                    <span class="font-medium"><?= $row['nama_lokasi']; ?></span>
+                                </td>
+
+                                <td data-label="File PKS" class="text-center hidden md:table-cell">
+                                    <?php if ($has_pks_utama): ?>
+                                        <a href="<?= $path_pks_utama ?>" target="_blank" class="btn-pks">
+                                            <i class="fa fa-file-pdf"></i> Lihat PKS
+                                        </a>
+                                    <?php else: ?>
+                                        <span style="color: gray; font-style: italic;">Belum ada</span>
+                                    <?php endif; ?>
+                                </td>
+
+                                <td data-label="Aksi" class="text-center">
+                                    <div style="display: flex; gap: 5px; justify-content: flex-end;">
+                                        <button class="btn-action btn-edit"
+                                            onclick='openEditModalUtama(<?= json_encode($row); ?>)'
+                                            style="padding: 6px 12px; font-weight: bold;">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button type="button" class="btn-action btn-delete"
+                                            onclick="hapusJukir('utama', <?= $row['id'] ?>, '<?= htmlspecialchars($row['nama_lengkap']) ?>')"
+                                            style="padding: 6px 12px; font-weight: bold;">
+                                            <i class="fas fa-trash"></i> Hapus
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
+
                             <?php
-                            if (mysqli_num_rows($result) > 0):
-                                $no = $offset + 1;
-                                while ($row = mysqli_fetch_assoc($result)):
-                                    $id_utama = $row['id'];
-                                    $path_foto_utama = !empty($row['foto_id_card']) ? 'assets/img/jukir/utama/' . $row['foto_id_card'] : 'assets/img/no-image.jpg';
-                                    $has_pks_utama = !empty($row['file_pks']);
-                                    $path_pks_utama = $has_pks_utama ? 'assets/docs/pks/utama/' . $row['file_pks'] : '#';
-                                    $query_pembantu = mysqli_query($conn, "SELECT * FROM jukir_pembantu WHERE id_utama = $id_utama");
-                                    $jumlah_pembantu = mysqli_num_rows($query_pembantu);
+                            if ($jumlah_pembantu > 0):
+                                while ($p = mysqli_fetch_assoc($query_pembantu)):
+                                    $path_foto_pbt = !empty($p['foto_id_card']) ? 'assets/img/jukir/pembantu/' . $p['foto_id_card'] : 'assets/img/no-image.jpg';
+                                    $has_pks_pbt = !empty($p['file_pks']);
+                                    $path_pks_pbt = $has_pks_pbt ? 'assets/docs/pks/pembantu/' . $p['file_pks'] : '#';
                                     ?>
-                                    <tr class="border-b border-gray-200 hover:bg-gray-50 bg-white">
-                                        <td data-label="No" class="text-center font-medium"><?= $no++; ?></td>
+                                    <tr class="pembantu-row-<?= $id_utama ?> bg-gray-50 border-b border-gray-100"
+                                        style="display: none;">
+                                        <td data-label="" class="text-center text-gray-400 text-xs"><i
+                                                class="fa fa-level-up-alt fa-rotate-90"></i></td>
 
                                         <td data-label="ID Card" class="text-center">
-                                            <img src="<?= $path_foto_utama ?>" class="img-thumbnail"
-                                                style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; cursor: pointer;"
-                                                onclick="window.open('<?= $path_foto_utama ?>', '_blank')">
+                                            <img src="<?= $path_foto_pbt ?>" class="img-thumbnail"
+                                                style="width: 35px; height: 35px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px dashed #cbd5e1;"
+                                                onclick="window.open('<?= $path_foto_pbt ?>', '_blank')">
                                         </td>
 
-                                        <td data-label="Nama Petugas" class="py-3 px-6 sticky left-0 bg-white z-10 shadow-[2px_0_5px_rgba(0,0,0,0.05)]" style="font-weight: bold">
-                                            <div class="font-bold text-gray-800 truncate max-w-[200px]" title="<?= htmlspecialchars($row['nama_lengkap']); ?>">
-                                                <?= $row['nama_lengkap']; ?>
+                                        <td data-label="Nama Pembantu" class="py-2 px-6 text-gray-700">
+                                            <div class="font-bold truncate max-w-[200px]"
+                                                title="<?= htmlspecialchars($p['nama_pembantu']); ?>">
+                                                <?= $p['nama_pembantu']; ?>
                                             </div>
-                                            <?php if ($jumlah_pembantu > 0): ?>
-                                                <button type="button" onclick="togglePembantuRow(<?= $id_utama ?>)"
-                                                    style="margin-top: 4px; padding: 2px 8px; font-size: 11px; background-color: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 12px; font-weight: 600; cursor: pointer;">
-                                                    <i class="fa fa-users"></i> Lihat <?= $jumlah_pembantu; ?> Pembantu
-                                                </button>
-                                            <?php endif; ?>
                                         </td>
 
-                                        <td data-label="NIK" class="py-3 px-6 hidden md:table-cell font-mono text-sm"><?= $row['nik']; ?></td>
-                                        <td data-label="No. Telp" class="py-3 px-6 hidden md:table-cell"><?= $row['no_telp']; ?></td>
-                                        <td data-label="Lokasi Parkir" class="py-3 px-6">
-                                            <span class="font-medium"><?= $row['nama_lokasi']; ?></span>
+                                        <td data-label="NIK" class="py-2 px-6 font-mono text-xs text-gray-600"><?= $p['nik']; ?></td>
+                                        <td data-label="Alamat" class="py-2 px-6 text-xs text-gray-500">
+                                            <div class="truncate max-w-[150px]"
+                                                title="<?= htmlspecialchars(!empty($p['alamat']) ? $p['alamat'] : '-') ?>">
+                                                <?= !empty($p['alamat']) ? $p['alamat'] : '-'; ?>
+                                            </div>
                                         </td>
+                                        <td data-label="Lokasi" style="color: gray; font-style: italic;">Sama dengan Utama</td>
 
-                                        <td data-label="File PKS" class="text-center hidden md:table-cell">
-                                            <?php if ($has_pks_utama): ?>
-                                                <a href="<?= $path_pks_utama ?>" target="_blank" class="btn-pks">
-                                                    <i class="fa fa-file-pdf"></i> Lihat PKS
+                                        <td data-label="File PKS" class="text-center">
+                                            <?php if ($has_pks_pbt): ?>
+                                                <a href="<?= $path_pks_pbt ?>" target="_blank" style="color: #059669; font-size: 12px;">
+                                                    <i class="fa fa-file-pdf"></i> PKS Pbt
                                                 </a>
                                             <?php else: ?>
-                                                <span style="color: gray; font-style: italic;">Belum ada</span>
+                                                <span class="text-gray-400 text-xs italic">-</span>
                                             <?php endif; ?>
                                         </td>
 
                                         <td data-label="Aksi" class="text-center">
-                                            <div style="display: flex; gap: 5px; justify-content: flex-end;">
-                                                <button class="btn-action btn-edit"
-                                                    onclick='openEditModalUtama(<?= json_encode($row); ?>)' style="padding: 6px 12px; font-weight: bold;">
-                                                    <i class="fas fa-edit"></i> Edit
-                                                </button>
+                                            <div style="display: flex; gap: 4px; justify-content: flex-end;">
+                                                <button type="button" class="btn-action btn-edit"
+                                                    style="padding: 1px 6px; font-size: 11px;"
+                                                    onclick='openEditModalPembantu(<?= json_encode($p); ?>)'>Edit</button>
                                                 <button type="button" class="btn-action btn-delete"
-                                                    onclick="hapusJukir('utama', <?= $row['id'] ?>, '<?= htmlspecialchars($row['nama_lengkap']) ?>')" style="padding: 6px 12px; font-weight: bold;">
-                                                    <i class="fas fa-trash"></i> Hapus
-                                                </button>
+                                                    style="padding: 1px 6px; font-size: 11px; border-radius: 4px;"
+                                                    onclick="hapusJukir('pembantu', <?= $p['id'] ?>, '<?= htmlspecialchars($p['nama_pembantu']) ?>')">Hapus</button>
                                             </div>
                                         </td>
                                     </tr>
-
-                                <?php
-                                if ($jumlah_pembantu > 0):
-                                    while ($p = mysqli_fetch_assoc($query_pembantu)):
-                                        $path_foto_pbt = !empty($p['foto_id_card']) ? 'assets/img/jukir/pembantu/' . $p['foto_id_card'] : 'assets/img/no-image.jpg';
-                                        $has_pks_pbt = !empty($p['file_pks']);
-                                        $path_pks_pbt = $has_pks_pbt ? 'assets/docs/pks/pembantu/' . $p['file_pks'] : '#';
-                                        ?>
-                                        <tr class="pembantu-row-<?= $id_utama ?> bg-gray-50 border-b border-gray-100"
-                                            style="display: none;">
-                                            <td data-label="" class="text-center text-gray-400 text-xs"><i
-                                                    class="fa fa-level-up-alt fa-rotate-90"></i></td>
-
-                                            <td data-label="ID Card" class="text-center">
-                                                <img src="<?= $path_foto_pbt ?>" class="img-thumbnail"
-                                                    style="width: 35px; height: 35px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px dashed #cbd5e1;"
-                                                    onclick="window.open('<?= $path_foto_pbt ?>', '_blank')">
-                                            </td>
-
-                                            <td data-label="Nama Pembantu" class="py-2 px-6 text-gray-700">
-                                                <div class="font-bold truncate max-w-[200px]" title="<?= htmlspecialchars($p['nama_pembantu']); ?>">
-                                                    <?= $p['nama_pembantu']; ?>
-                                                </div>
-                                            </td>
-
-                                            <td data-label="NIK" class="py-2 px-6 font-mono text-xs text-gray-600"><?= $p['nik']; ?></td>
-                                            <td data-label="Alamat" class="py-2 px-6 text-xs text-gray-500">
-                                                <div class="truncate max-w-[150px]" title="<?= htmlspecialchars(!empty($p['alamat']) ? $p['alamat'] : '-') ?>">
-                                                    <?= !empty($p['alamat']) ? $p['alamat'] : '-'; ?>
-                                                </div>
-                                            </td>
-                                            <td data-label="Lokasi" style="color: gray; font-style: italic;">Sama dengan Utama</td>
-
-                                            <td data-label="File PKS" class="text-center">
-                                                <?php if ($has_pks_pbt): ?>
-                                                    <a href="<?= $path_pks_pbt ?>" target="_blank"
-                                                        style="color: #059669; font-size: 12px;">
-                                                        <i class="fa fa-file-pdf"></i> PKS Pbt
-                                                    </a>
-                                                <?php else: ?>
-                                                    <span class="text-gray-400 text-xs italic">-</span>
-                                                <?php endif; ?>
-                                            </td>
-
-                                            <td data-label="Aksi" class="text-center">
-                                                <div style="display: flex; gap: 4px; justify-content: flex-end;">
-                                                    <button type="button" class="btn-action btn-edit"
-                                                        style="padding: 1px 6px; font-size: 11px;"
-                                                        onclick='openEditModalPembantu(<?= json_encode($p); ?>)'>Edit</button>
-                                                    <button type="button" class="btn-action btn-delete"
-                                                        style="padding: 1px 6px; font-size: 11px; border-radius: 4px;"
-                                                        onclick="hapusJukir('pembantu', <?= $p['id'] ?>, '<?= htmlspecialchars($p['nama_pembantu']) ?>')">Hapus</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <?php
-                                    endwhile;
-                                endif;
+                                    <?php
                                 endwhile;
-                            else:
-                            ?>
-                                <tr>
-                                    <td colspan="8">
-                                        <div class="empty-state">
-                                            <div class="empty-state-icon"><i class="fas fa-user-tag"></i></div>
-                                            <p class="empty-state-title">Data Petugas Tidak Ditemukan</p>
-                                            <p class="empty-state-desc">Belum ada data petugas parkir yang tersedia atau sesuai dengan pencarian Anda.</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="flex items-center justify-between mt-6 px-4">
-                    <p class="text-sm text-slate-500">
-                        Menampilkan halaman <span class="font-medium text-slate-900"><?= $page ?></span> dari <span class="font-medium text-slate-900"><?= max(1, $total_pages) ?></span>
-                    </p>
-                    <nav class="flex items-center gap-2" aria-label="Pagination">
-                        <?php
-                        $query_params = http_build_query([
-                            'search' => $search,
-                            'kecamatan' => $kecamatan,
-                            'titik_parkir' => $titik_parkir,
-                        ]);
+                            endif;
+                        endwhile;
+                    else:
                         ?>
-                        
-                        <!-- Previous Button -->
-                        <a href="<?= $page > 1 ? '?page=' . ($page - 1) . '&' . $query_params : '#' ?>" 
-                           class="px-3 py-2 rounded-lg text-sm font-medium transition-colors <?= $page > 1 ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed pointer-events-none' ?>"
-                           aria-disabled="<?= $page <= 1 ? 'true' : 'false' ?>">
-                            &larr; Sebelumnya
-                        </a>
+                        <tr>
+                            <td colspan="8">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon"><i class="fas fa-user-tag"></i></div>
+                                    <p class="empty-state-title">Data Petugas Tidak Ditemukan</p>
+                                    <p class="empty-state-desc">Belum ada data petugas parkir yang tersedia atau sesuai
+                                        dengan pencarian Anda.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="flex items-center justify-between mt-6 px-4">
+            <p class="text-sm text-slate-500">
+                Menampilkan halaman <span class="font-medium text-slate-900"><?= $page ?></span> dari <span
+                    class="font-medium text-slate-900"><?= max(1, $total_pages) ?></span>
+            </p>
+            <nav class="flex items-center gap-2" aria-label="Pagination">
+                <?php
+                $query_params = http_build_query([
+                    'search' => $search,
+                    'kecamatan' => $kecamatan,
+                    'titik_parkir' => $titik_parkir,
+                ]);
+                ?>
 
-                        <!-- Page Numbers -->
-                        <div class="flex items-center gap-1 hidden sm:flex">
-                            <?php for ($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++): ?>
-                                <a href="?page=<?= $i ?>&<?= $query_params ?>" 
-                                   class="w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors <?= ($page == $i) ? 'bg-brand-950 text-white' : 'text-slate-600 hover:bg-slate-100' ?>">
-                                    <?= $i ?>
-                                </a>
-                            <?php endfor; ?>
-                        </div>
+                <!-- Previous Button -->
+                <a href="<?= $page > 1 ? '?page=' . ($page - 1) . '&' . $query_params : '#' ?>"
+                    class="px-3 py-2 rounded-lg text-sm font-medium transition-colors <?= $page > 1 ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed pointer-events-none' ?>"
+                    aria-disabled="<?= $page <= 1 ? 'true' : 'false' ?>">
+                    &larr; Sebelumnya
+                </a>
 
-                        <!-- Next Button -->
-                        <a href="<?= $page < $total_pages ? '?page=' . ($page + 1) . '&' . $query_params : '#' ?>" 
-                           class="px-3 py-2 rounded-lg text-sm font-medium transition-colors <?= $page < $total_pages ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed pointer-events-none' ?>"
-                           aria-disabled="<?= $page >= $total_pages ? 'true' : 'false' ?>">
-                            Selanjutnya &rarr;
+                <!-- Page Numbers -->
+                <div class="flex items-center gap-1 hidden sm:flex">
+                    <?php for ($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++): ?>
+                        <a href="?page=<?= $i ?>&<?= $query_params ?>"
+                            class="w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors <?= ($page == $i) ? 'bg-brand-950 text-white' : 'text-slate-600 hover:bg-slate-100' ?>">
+                            <?= $i ?>
                         </a>
-                    </nav>
+                    <?php endfor; ?>
                 </div>
+
+                <!-- Next Button -->
+                <a href="<?= $page < $total_pages ? '?page=' . ($page + 1) . '&' . $query_params : '#' ?>"
+                    class="px-3 py-2 rounded-lg text-sm font-medium transition-colors <?= $page < $total_pages ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed pointer-events-none' ?>"
+                    aria-disabled="<?= $page >= $total_pages ? 'true' : 'false' ?>">
+                    Selanjutnya &rarr;
+                </a>
+            </nav>
+        </div>
     </main>
 
     <div id="modalJukir" class="modal">
         <div class="modal-content" style="max-width: 600px; width: 100%;">
-            <button type="button" onclick="closeModal()" class="btn-close-modal" aria-label="Tutup Modal"><i class="fas fa-times"></i></button>
+            <button type="button" onclick="closeModal()" class="btn-close-modal" aria-label="Tutup Modal"><i
+                    class="fas fa-times"></i></button>
             <div class="modal-header">
-                <h3 id="modalTitle" style="margin: 0; font-weight: 700; color: var(--text-main);">Tambah Data Personel</h3>
+                <h3 id="modalTitle" style="margin: 0; font-weight: 700; color: var(--text-main);">Tambah Data Personel
+                </h3>
             </div>
 
             <div id="step-indicator-container"
@@ -292,6 +327,12 @@ include 'api/fetch_jukir.php';
                             <label>Upload File PKS</label>
                             <input type="file" name="file_pks" class="form-control" accept=".pdf, .doc, .docx, image/*">
                             <small id="info_file" style="display: none; color: #3498db; margin-top: 5px;"></small>
+                        </div>
+
+                        <div class="form-group" style="flex: 1;">
+                            <label>No. Rekening Bank Jatim</label>
+                            <input type="number" name="no_rekening" id="form_rekening_utama" class="form-control"
+                                placeholder="Contoh: 0123456789">
                         </div>
 
                         <div class="form-group">
@@ -343,11 +384,11 @@ include 'api/fetch_jukir.php';
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn-secondary" onclick="closeModal()">Batal</button>
-                        <button type="submit" class="btn-primary" id="btnSubmitUtama">Simpan Jukir Utama</button>
+                        <div style="padding: 0.5rem 0.5rem 0.5rem 0.5rem; background: #f8fafc; border-top: 1px solid rgba(226,232,240,0.6); display: flex; justify-content: flex-end;
+                                    border-radius: 0 0 var(--radius-xl) var(--radius-xl); flex-shrink: 0;">
+                            <button type="button" class="btn-secondary" onclick="closeModal()">Batal</button>
+                            <button type="submit" class="btn-primary" id="btnSubmitUtama">Simpan Jukir Utama</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -356,6 +397,8 @@ include 'api/fetch_jukir.php';
                 <form action="store/proses_jukir.php?action=add&type=pembantu" method="POST" id="form-jukir-pembantu"
                     enctype="multipart/form-data">
                     <input type="hidden" name="id_pembantu" id="form_id_pembantu">
+                    <input type="hidden" name="file_lama" id="file_lama_field">
+                    <input type="hidden" name="foto_lama" id="foto_lama_field">
 
                     <div class="modal-body">
                         <div class="form-group">
@@ -373,6 +416,24 @@ include 'api/fetch_jukir.php';
                         </div>
 
                         <div class="form-group">
+                            <label>Foto ID Card</label>
+                            <input type="file" name="foto_id_card" class="form-control" accept="image/*">
+                            <small id="info_foto" style="display: none; color: #3498db; margin-top: 5px;"></small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Upload File PKS</label>
+                            <input type="file" name="file_pks" class="form-control" accept=".pdf, .doc, .docx, image/*">
+                            <small id="info_file" style="display: none; color: #3498db; margin-top: 5px;"></small>
+                        </div>
+
+                        <div class="form-group" style="flex: 1;">
+                            <label>No. Rekening Bank Jatim</label>
+                            <input type="number" name="no_rekening_pembantu" id="form_rekening_pembantu"
+                                class="form-control" placeholder="Contoh: 0123456789">
+                        </div>
+
+                        <div class="form-group">
                             <label>NIK Petugas Pembantu</label>
                             <input type="text" name="nik_pembantu" id="form_nik_pembantu" class="form-control" required
                                 maxlength="16">
@@ -380,7 +441,8 @@ include 'api/fetch_jukir.php';
 
                         <div class="form-group">
                             <label>Nama Lengkap Pembantu</label>
-                            <input type="text" name="nama_pembantu" id="form_nama_pembantu" class="form-control" required>
+                            <input type="text" name="nama_pembantu" id="form_nama_pembantu" class="form-control"
+                                required>
                         </div>
 
                         <div class="form-group">
@@ -388,11 +450,12 @@ include 'api/fetch_jukir.php';
                             <input type="text" name="alamat_pembantu" id="form_alamat_pembantu" class="form-control"
                                 required>
                         </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn-secondary" onclick="closeModal()">Batal</button>
-                        <button type="submit" class="btn-primary" id="btnSubmitPembantu">Simpan Petugas Pembantu</button>
+                        <div style="padding: 0.5rem 0.5rem 0.5rem 0.5rem; background: #f8fafc; border-top: 1px solid rgba(226,232,240,0.6); display: flex; justify-content: flex-end;
+                                    border-radius: 0 0 var(--radius-xl) var(--radius-xl); flex-shrink: 0;">
+                            <button type="button" class="btn-secondary" onclick="closeModal()">Batal</button>
+                            <button type="submit" class="btn-primary" id="btnSubmitPembantu">Simpan Petugas
+                                Pembantu</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -501,6 +564,7 @@ include 'api/fetch_jukir.php';
             document.getElementById('form_alamat').value = data.alamat;
             document.getElementById('form_telp').value = data.no_telp;
             document.getElementById('form_lokasi').value = data.id_lokasi;
+            document.getElementById('form_rekening_utama').value = data.no_rekening || "";
             if (document.getElementById('lokasi_search')) {
                 document.getElementById('lokasi_search').value = data.kode_qris + " - " + data.nama_lokasi;
             }
@@ -521,6 +585,7 @@ include 'api/fetch_jukir.php';
             document.getElementById('form_nik_pembantu').value = data.nik;
             document.getElementById('form_nama_pembantu').value = data.nama_pembantu;
             document.getElementById('form_alamat_pembantu').value = data.alamat_pembantu || "";
+            document.getElementById('form_rekening_pembantu').value = data.no_rekening || "";
 
             document.getElementById('modalJukir').style.display = 'flex';
         }
@@ -589,13 +654,13 @@ include 'api/fetch_jukir.php';
                 }
             });
         }
-        
+
         function hapusJukir(type, id, nama) {
             let role = type === 'utama' ? 'Jukir Utama' : 'Jukir Pembantu';
-            let warningText = type === 'utama' ? 
-                `Apakah Anda yakin ingin menghapus <b>${nama}</b>?<br><br><span style="color:#ef4444;">Peringatan: Seluruh Jukir Pembantu yang terkait juga akan ikut terhapus!</span>` : 
+            let warningText = type === 'utama' ?
+                `Apakah Anda yakin ingin menghapus <b>${nama}</b>?<br><br><span style="color:#ef4444;">Peringatan: Seluruh Jukir Pembantu yang terkait juga akan ikut terhapus!</span>` :
                 `Apakah Anda yakin ingin menghapus <b>${nama}</b>?`;
-            
+
             Swal.fire({
                 title: `Hapus ${role}?`,
                 html: warningText,
@@ -618,4 +683,5 @@ include 'api/fetch_jukir.php';
         }
     </script>
 </body>
+
 </html>
