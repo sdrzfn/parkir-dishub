@@ -68,11 +68,12 @@ $tables_config = [
 
 <?php include '../components/header.php'; ?>
 
-<body class="font-sans text-slate-800 antialiased min-h-screen pt-24" style="background: radial-gradient(100% 100% at 100% 0%, #fef3c7 0%, #f8fafc 100%);">
+<body class="font-sans text-slate-800 antialiased min-h-screen pt-24"
+    style="background: radial-gradient(100% 100% at 100% 0%, #fef3c7 0%, #f8fafc 100%);">
 
     <?php include '../components/navbar.php'; ?>
 
-    <main class="container mx-auto" style="max-width:1400px; padding: 0 15px;">
+    <main class="container mx-auto" style="max-width:1400px; padding: 27px 55px;">
         <?php include '../components/breadcrumb.php'; ?>
 
         <div class="page-header">
@@ -86,19 +87,37 @@ $tables_config = [
             <form method="GET" action="" class="filter-search-row">
                 <div class="filter-search-wrapper">
                     <i class="fas fa-search filter-search-icon"></i>
-                    <input type="text" name="search" class="filter-search-input" placeholder="Cari Jukir, Lokasi, atau QRIS..." value="<?= htmlspecialchars($search ?? '') ?>">
+                    <input type="text" name="search" class="filter-search-input"
+                        placeholder="Cari Jukir, Lokasi, atau QRIS..." value="<?= htmlspecialchars($search ?? '') ?>">
                 </div>
-                
+
                 <select name="kecamatan" class="filter-select" style="max-width: 200px;">
-                    <option value="">Semua Wilayah</option>
-                    <?php 
-                    if(isset($list_wilayah)) {
-                        mysqli_data_seek($list_wilayah, 0);
-                        while ($w = mysqli_fetch_assoc($list_wilayah)): 
-                            $sel = (isset($filter_kec) && $filter_kec == $w['wilayah']) ? 'selected' : '';
+                    <option value="">Semua Kecamatan</option>
+                    <?php
+                    $list_kecamatan = [
+                        'Balongbendo',
+                        'Taman',
+                        'Buduran',
+                        'Porong',
+                        'Tanggulangin',
+                        'Candi',
+                        'Prambon',
+                        'Tarik',
+                        'Gedangan',
+                        'Sedati',
+                        'Tulangan',
+                        'Jabon',
+                        'Sidoarjo',
+                        'Waru',
+                        'Krembung',
+                        'Sukodono',
+                        'Wonoayu'
+                    ];
+                    foreach ($list_kecamatan as $kec):
+                        $selected = ($kecamatan === $kec) ? 'selected' : '';
+                        echo "<option value='$kec' $selected>$kec</option>";
+                    endforeach;
                     ?>
-                        <option value="<?= $w['wilayah'] ?>" <?= $sel ?>><?= $w['wilayah'] ?></option>
-                    <?php endwhile; } ?>
                 </select>
 
                 <button type="submit" class="filter-btn-search">
@@ -109,19 +128,23 @@ $tables_config = [
 
         <?php foreach ($tables_config as $table): ?>
             <div class="table-section-wrapper" style="margin-top: 2rem; margin-bottom: 1rem;">
-                <h2 style="font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;">
-                    <?= $table['title'] ?> 
-                    <span style="font-size: 0.8rem; background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 20px;">
+                <h2
+                    style="font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;">
+                    <?= $table['title'] ?>
+                    <span
+                        style="font-size: 0.8rem; background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 20px;">
                         <?= count($table['list']) ?> Data
                     </span>
                 </h2>
 
-                <div class="table-container relative max-h-[45vh] overflow-y-auto overflow-x-auto w-full" style="border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+                <div class="table-container relative max-h-[45vh] overflow-y-auto overflow-x-auto w-full"
+                    style="border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
                     <table class="custom-table w-full whitespace-nowrap">
                         <thead>
                             <tr>
                                 <th style="width: 50px;">No</th>
-                                <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Jukir (Utama/Pembantu)</th>
+                                <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Jukir
+                                    (Utama/Pembantu)</th>
                                 <th>Lokasi</th>
                                 <th class="hidden md:table-cell">Realisasi</th>
                                 <th class="hidden md:table-cell">Target</th>
@@ -132,7 +155,7 @@ $tables_config = [
                             </tr>
                         </thead>
                         <tbody>
-                            <?php 
+                            <?php
                             if (count($table['list']) > 0):
                                 $no = 1;
                                 foreach ($table['list'] as $row):
@@ -151,93 +174,104 @@ $tables_config = [
                                     $tunggakan = ($target_dana > $realisasi_dana) ? ($target_dana - $realisasi_dana) : 0;
                                     $denda = $tunggakan * 0.02;
                                     $imbal_jasa = $realisasi_dana * 0.40;
-                            ?>
-                                <tr class="row-utama" onclick="togglePembantu(<?= $id_utama; ?>)" style="<?= $table['row_style'] ?>">
-                                    <td data-label="No"><?= $no++; ?></td>
-                                    <td data-label="Nama Jukir" class="col-nama sticky left-0 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.05)]" style="background-color: inherit;">
-                                        <div class="flex-nama items-center">
-                                            <i class="fa fa-chevron-right icon-toggle" id="icon-<?= $id_utama; ?>"></i>
-                                            <strong class="truncate max-w-[200px]" title="<?= htmlspecialchars($row['nama_utama']); ?>">
-                                                <?= $row['nama_utama']; ?>
-                                            </strong>
-                                            <?php if ($jumlah_pembantu > 0): ?>
-                                                <span class="badge-count whitespace-nowrap"><?= $jumlah_pembantu; ?> Pembantu</span>
-                                            <?php endif; ?>
-                                        </div>
-                                    </td>
-                                    <td data-label="Lokasi">
-                                        <div class="truncate max-w-[150px]" title="<?= htmlspecialchars($row['lokasi']); ?>">
-                                            <?= $row['lokasi']; ?>
-                                        </div>
-                                    </td>
-                                    <td data-label="Realisasi" class="text-success font-medium hidden md:table-cell">Rp <?= number_format($realisasi_dana, 0, ',', '.'); ?></td>
-                                    <td data-label="Target" class="text-primary hidden md:table-cell">Rp <?= number_format($target_dana, 0, ',', '.'); ?></td>
-                                    <td data-label="Persentase" class="<?= ($persen >= 100) ? 'text-success' : (($persen >= 65) ? 'text-warning' : 'text-danger'); ?> font-bold">
-                                        <?= $persen; ?>%
-                                    </td>
+                                    ?>
+                                    <tr class="row-utama" onclick="togglePembantu(<?= $id_utama; ?>)"
+                                        style="<?= $table['row_style'] ?>">
+                                        <td data-label="No"><?= $no++; ?></td>
+                                        <td data-label="Nama Jukir"
+                                            class="col-nama sticky left-0 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.05)]"
+                                            style="background-color: inherit;">
+                                            <div class="flex-nama items-center">
+                                                <i class="fa fa-chevron-right icon-toggle" id="icon-<?= $id_utama; ?>"></i>
+                                                <strong class="truncate max-w-[200px]"
+                                                    title="<?= htmlspecialchars($row['nama_utama']); ?>">
+                                                    <?= $row['nama_utama']; ?>
+                                                </strong>
+                                                <?php if ($jumlah_pembantu > 0): ?>
+                                                    <span class="badge-count whitespace-nowrap"><?= $jumlah_pembantu; ?> Pembantu</span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                        <td data-label="Lokasi">
+                                            <div class="truncate max-w-[150px]" title="<?= htmlspecialchars($row['lokasi']); ?>">
+                                                <?= $row['lokasi']; ?>
+                                            </div>
+                                        </td>
+                                        <td data-label="Realisasi" class="text-success font-medium hidden md:table-cell">Rp
+                                            <?= number_format($realisasi_dana, 0, ',', '.'); ?></td>
+                                        <td data-label="Target" class="text-primary hidden md:table-cell">Rp
+                                            <?= number_format($target_dana, 0, ',', '.'); ?></td>
+                                        <td data-label="Persentase"
+                                            class="<?= ($persen >= 100) ? 'text-success' : (($persen >= 65) ? 'text-warning' : 'text-danger'); ?> font-bold">
+                                            <?= $persen; ?>%
+                                        </td>
 
-                                    <td data-label="Denda (2%)" style="color: #b91c1c; font-weight: bold;">
-                                        <?= $denda > 0 ? 'Rp ' . number_format($denda, 0, ',', '.') : '<span style="color: #94a3b8; font-weight: normal;">-</span>'; ?>
-                                    </td>
+                                        <td data-label="Denda (2%)" style="color: #b91c1c; font-weight: bold;">
+                                            <?= $denda > 0 ? 'Rp ' . number_format($denda, 0, ',', '.') : '<span style="color: #94a3b8; font-weight: normal;">-</span>'; ?>
+                                        </td>
 
-                                    <td data-label="Imbal Jasa (40%)" style="color: #16a34a; font-weight: bold;">
-                                        Rp <?= number_format($imbal_jasa, 0, ',', '.'); ?>
-                                    </td>
+                                        <td data-label="Imbal Jasa (40%)" style="color: #16a34a; font-weight: bold;">
+                                            Rp <?= number_format($imbal_jasa, 0, ',', '.'); ?>
+                                        </td>
 
-                                    <td data-label="Aksi" style="text-align: center;">
-                                        <div style="display: flex; gap: 8px; justify-content: center;">
-                                            <button class="btn-action btn-edit"
-                                                onclick="event.stopPropagation(); window.location.href='retribusi-detail.php?id=<?= $row['id']; ?>'"
-                                                style="padding: 6px 12px; font-weight: bold;">
-                                                <i class="fas fa-eye" style="margin-right: 4px;"></i> Detail
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        <td data-label="Aksi" style="text-align: center;">
+                                            <div style="display: flex; gap: 8px; justify-content: center;">
+                                                <button class="btn-action btn-edit"
+                                                    onclick="event.stopPropagation(); window.location.href='retribusi-detail.php?id=<?= $row['id']; ?>'"
+                                                    style="padding: 6px 12px; font-weight: bold;">
+                                                    <i class="fas fa-eye" style="margin-right: 4px;"></i> Detail
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
 
-                                <tr id="pembantu-<?= $id_utama; ?>" class="row-pembantu" style="display: none; background-color: #ffffff;">
-                                    <td></td>
-                                    <td colspan="8">
-                                        <div class="pembantu-container" style="padding: 10px 15px;">
-                                            <?php if ($jumlah_pembantu > 0): ?>
-                                                <table class="table-inner">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Nama Jukir Pembantu</th>
-                                                            <th>NIK</th>
-                                                            <th>Alamat</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <?php foreach ($pembantu_list as $p): ?>
+                                    <tr id="pembantu-<?= $id_utama; ?>" class="row-pembantu"
+                                        style="display: none; background-color: #ffffff;">
+                                        <td></td>
+                                        <td colspan="8">
+                                            <div class="pembantu-container" style="padding: 10px 15px;">
+                                                <?php if ($jumlah_pembantu > 0): ?>
+                                                    <table class="table-inner">
+                                                        <thead>
                                                             <tr>
-                                                                <td data-label="Nama Pembantu">
-                                                                    <div class="truncate max-w-[150px]" title="<?= htmlspecialchars($p['nama_pembantu']); ?>">
-                                                                        <?= $p['nama_pembantu']; ?>
-                                                                    </div>
-                                                                </td>
-                                                                <td data-label="NIK"><?= $p['nik']; ?></td>
-                                                                <td data-label="Alamat">
-                                                                    <div class="truncate max-w-[200px]" title="<?= htmlspecialchars($p['alamat'] ?? '-'); ?>">
-                                                                        <?= $p['alamat'] ?? '-'; ?>
-                                                                    </div>
-                                                                </td>
+                                                                <th>Nama Jukir Pembantu</th>
+                                                                <th>NIK</th>
+                                                                <th>Alamat</th>
                                                             </tr>
-                                                        <?php endforeach; ?>
-                                                    </tbody>
-                                                </table>
-                                            <?php else: ?>
-                                                <p class="no-data">Tidak ada jukir pembantu terdaftar.</p>
-                                            <?php endif; ?>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php 
-                                endforeach; 
-                            else: 
-                            ?>
+                                                        </thead>
+                                                        <tbody>
+                                                            <?php foreach ($pembantu_list as $p): ?>
+                                                                <tr>
+                                                                    <td data-label="Nama Pembantu">
+                                                                        <div class="truncate max-w-[150px]"
+                                                                            title="<?= htmlspecialchars($p['nama_pembantu']); ?>">
+                                                                            <?= $p['nama_pembantu']; ?>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td data-label="NIK"><?= $p['nik']; ?></td>
+                                                                    <td data-label="Alamat">
+                                                                        <div class="truncate max-w-[200px]"
+                                                                            title="<?= htmlspecialchars($p['alamat'] ?? '-'); ?>">
+                                                                            <?= $p['alamat'] ?? '-'; ?>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            <?php endforeach; ?>
+                                                        </tbody>
+                                                    </table>
+                                                <?php else: ?>
+                                                    <p class="no-data">Tidak ada jukir pembantu terdaftar.</p>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php
+                                endforeach;
+                            else:
+                                ?>
                                 <tr>
-                                    <td colspan="9" style="text-align: center; padding: 20px; color: #64748b; font-style: italic;">
+                                    <td colspan="9"
+                                        style="text-align: center; padding: 20px; color: #64748b; font-style: italic;">
                                         <?= $table['empty_msg'] ?>
                                     </td>
                                 </tr>
@@ -252,33 +286,35 @@ $tables_config = [
             <div class="empty-state" style="margin-top: 2rem;">
                 <div class="empty-state-icon"><i class="fas fa-receipt"></i></div>
                 <p class="empty-state-title">Data Retribusi Tidak Ditemukan</p>
-                <p class="empty-state-desc">Belum ada data retribusi petugas parkir yang tersedia atau sesuai dengan pencarian Anda.</p>
+                <p class="empty-state-desc">Belum ada data retribusi petugas parkir yang tersedia atau sesuai dengan
+                    pencarian Anda.</p>
             </div>
         <?php endif; ?>
 
         <div class="flex items-center justify-between mt-6 px-4">
             <p class="text-sm text-slate-500">
-                Menampilkan halaman <span class="font-medium text-slate-900"><?= $page ?></span> dari <span class="font-medium text-slate-900"><?= max(1, $total_pages) ?></span>
+                Menampilkan halaman <span class="font-medium text-slate-900"><?= $page ?></span> dari <span
+                    class="font-medium text-slate-900"><?= max(1, $total_pages) ?></span>
             </p>
             <nav class="flex items-center gap-2" aria-label="Pagination">
-                <a href="<?= $page > 1 ? '?page=' . ($page - 1) : '#' ?>" 
-                   class="px-3 py-2 rounded-lg text-sm font-medium transition-colors <?= $page > 1 ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed pointer-events-none' ?>"
-                   aria-disabled="<?= $page <= 1 ? 'true' : 'false' ?>">
+                <a href="<?= $page > 1 ? '?page=' . ($page - 1) : '#' ?>"
+                    class="px-3 py-2 rounded-lg text-sm font-medium transition-colors <?= $page > 1 ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed pointer-events-none' ?>"
+                    aria-disabled="<?= $page <= 1 ? 'true' : 'false' ?>">
                     &larr; Sebelumnya
                 </a>
 
                 <div class="flex items-center gap-1 hidden sm:flex">
                     <?php for ($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++): ?>
-                        <a href="?page=<?= $i ?>" 
-                           class="w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors <?= ($page == $i) ? 'bg-brand-950 text-white' : 'text-slate-600 hover:bg-slate-100' ?>">
+                        <a href="?page=<?= $i ?>"
+                            class="w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors <?= ($page == $i) ? 'bg-brand-950 text-white' : 'text-slate-600 hover:bg-slate-100' ?>">
                             <?= $i ?>
                         </a>
                     <?php endfor; ?>
                 </div>
 
-                <a href="<?= $page < $total_pages ? '?page=' . ($page + 1) : '#' ?>" 
-                   class="px-3 py-2 rounded-lg text-sm font-medium transition-colors <?= $page < $total_pages ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed pointer-events-none' ?>"
-                   aria-disabled="<?= $page >= $total_pages ? 'true' : 'false' ?>">
+                <a href="<?= $page < $total_pages ? '?page=' . ($page + 1) : '#' ?>"
+                    class="px-3 py-2 rounded-lg text-sm font-medium transition-colors <?= $page < $total_pages ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed pointer-events-none' ?>"
+                    aria-disabled="<?= $page >= $total_pages ? 'true' : 'false' ?>">
                     Selanjutnya &rarr;
                 </a>
             </nav>
@@ -287,9 +323,11 @@ $tables_config = [
 
     <div id="modalJukir" class="modal">
         <div class="modal-content">
-            <button type="button" onclick="closeModal()" class="btn-close-modal" aria-label="Tutup Modal"><i class="fas fa-times"></i></button>
+            <button type="button" onclick="closeModal()" class="btn-close-modal" aria-label="Tutup Modal"><i
+                    class="fas fa-times"></i></button>
             <div class="modal-header">
-                <h3 id="modalTitle" style="margin: 0; font-weight: 700; color: var(--text-main);">Tambah Petugas Parkir</h3>
+                <h3 id="modalTitle" style="margin: 0; font-weight: 700; color: var(--text-main);">Tambah Petugas Parkir
+                </h3>
             </div>
 
             <form action="../store/proses_jukir.php?action=add" method="POST">
@@ -305,7 +343,8 @@ $tables_config = [
                     </div>
                     <div class="form-group">
                         <label>Tempat, Tanggal Lahir</label>
-                        <input type="text" name="ttl" id="form_ttl" class="form-control" placeholder="Contoh: Sidoarjo, 12-05-1985">
+                        <input type="text" name="ttl" id="form_ttl" class="form-control"
+                            placeholder="Contoh: Sidoarjo, 12-05-1985">
                     </div>
                     <div class="form-group">
                         <label>Alamat Lengkap</label>
@@ -324,7 +363,8 @@ $tables_config = [
                                 mysqli_data_seek($list_lokasi, 0);
                                 while ($lok = mysqli_fetch_assoc($list_lokasi)):
                                     ?>
-                                    <option value="<?= $lok['id'] ?>"><?= $lok['kode_qris'] ?> - <?= $lok['nama_lokasi'] ?></option>
+                                    <option value="<?= $lok['id'] ?>"><?= $lok['kode_qris'] ?> - <?= $lok['nama_lokasi'] ?>
+                                    </option>
                                 <?php endwhile; ?>
                             </select>
                         </div>
@@ -425,4 +465,5 @@ $tables_config = [
         })();
     </script>
 </body>
+
 </html>

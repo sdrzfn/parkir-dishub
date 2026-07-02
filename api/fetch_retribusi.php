@@ -43,7 +43,7 @@ $sql = "SELECT
             ju.target_bulanan AS target,
             l.nama_lokasi    AS lokasi,
             l.kode_qris,
-            kw.wilayah       AS kecamatan,
+            l.kecamatan       AS kecamatan,
             (SELECT GROUP_CONCAT(nama_pembantu SEPARATOR ', ')
              FROM jukir_pembantu WHERE id_utama = ju.id) AS nama_pembantu,
             IFNULL(SUM(tr.jumlah_setoran), 0) AS realisasi
