@@ -326,10 +326,33 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
-                                <a href="../config/cetak-sp.php?id=<?= $id_jukir ?>&kode=<?= $rekomendasi['kode'] ?>" target="_blank"
+                                <?php if ($rekomendasi !== null):
+                                    $q_log = mysqli_query($conn, "SELECT * FROM log_aksi_jukir WHERE id_jukir = $id_jukir ORDER BY tanggal_aksi DESC");
+                                        if (mysqli_num_rows($q_log) > 0):
+                                            while ($log = mysqli_fetch_assoc($q_log)):
+                                            ?>
+                                                <?php if ($rekomendasi['kode'] === 'dua_tombol'): ?>
+                                                    <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank" class="btn-action btn-danger">File SP</a>
+                                                    <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank" class="btn-action btn-warning">File Tagihan</a>
+
+                                                <?php elseif ($rekomendasi['kode'] === 'sp1'): ?>
+                                                    <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank" class="btn-action btn-delete ?>"> 
+                                                        <?= $rekomendasi['label'] ?> 
+                                                    </a>
+
+                                                <?php elseif ($rekomendasi['kode'] === 'tagihan'): ?>
+                                                    <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank" class="btn-action btn-<?= $rekomendasi['color'] ?>"> 
+                                                        <?= $rekomendasi['label'] ?> 
+                                                    </a>
+                                                <?php endif; 
+                                            endwhile;
+                                        endif;
+                                    ?>
+                                <?php endif; ?>
+                                <!-- <a href="../config/cetak-sp.php?id=<?= $id_jukir ?>&kode=<?= $rekomendasi['kode'] ?>" target="_blank"
                                     class="btn-action btn-delete">
                                     <?= $rekomendasi['label'] ?>
-                                </a>
+                                </a> -->
                             </table>
                         </div>
                     </div>

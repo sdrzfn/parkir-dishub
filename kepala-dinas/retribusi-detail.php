@@ -58,16 +58,16 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                     <h2 style="font-size: 1.5rem; font-weight: 800; color: #1e293b; margin: 0;">Detail Retribusi
                         Jukir</h2>
                 </div>
-                <button onclick="openModal()" class="btn-add-manual">
+                <!-- <button onclick="openModal()" class="btn-add-manual">
                     + Tambah Setoran Manual
-                </button>
+                </button> -->
             </div>
 
             <?php if ($rekomendasi): ?>
                 <div class="alert-card <?= $rekomendasi['color'] === 'danger' ? 'danger' : 'warning' ?>">
                     <h4 class="alert-card-title"><i class="fas fa-magic"></i> Jukir Perlu Diproses</h4>
                     <p class="alert-card-desc">
-                        Klik tombol di bawah untuk men-generate <b>Surat Peringatan</b> & <b>Surat Penagihan</b> secara
+                        Hubungi admin untuk men-generate <b>Surat Peringatan</b> & <b>Surat Penagihan</b> secara
                         otomatis sesuai data bulan ini.
                     </p>
 
@@ -76,7 +76,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                         <input type="hidden" name="jenis_surat" value="<?= $rekomendasi['kode'] ?>">
                         <input type="hidden" name="nominal_tunggakan" value="<?= $target - $realisasi ?>">
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: end;">
+                        <!-- <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: end;">
                             <div>
                                 <label class="form-label">Metode Pengiriman</label>
                                 <select name="metode" class="form-select" required>
@@ -87,7 +87,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                             <button type="submit" class="btn-submit-modal" style="margin: 0; width: 100%;">
                                 <i class="fas fa-sync-alt"></i> Generate Surat
                             </button>
-                        </div>
+                        </div> -->
                     </form>
                 </div>
             <?php endif; ?>
@@ -105,9 +105,9 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                         </h3>
                         <span class="badge-role" style="display: inline-block;">Petugas Parkir Utama</span>
                     </div>
-                    <button onclick="openEditJukirModal()" class="btn-edit-profile">
+                    <!-- <button onclick="openEditJukirModal()" class="btn-edit-profile">
                         <i class="fas fa-edit"></i> Edit Profil
-                    </button>
+                    </button> -->
                 </div>
 
                 <div class="card" style="position: relative;">
@@ -326,10 +326,33 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
-                                <a href="../config/cetak-sp.php?id=<?= $id_jukir ?>&kode=<?= $rekomendasi['kode'] ?>" target="_blank"
+                                <?php if ($rekomendasi !== null):
+                                    $q_log = mysqli_query($conn, "SELECT * FROM log_aksi_jukir WHERE id_jukir = $id_jukir ORDER BY tanggal_aksi DESC");
+                                        if (mysqli_num_rows($q_log) > 0):
+                                            while ($log = mysqli_fetch_assoc($q_log)):
+                                            ?>
+                                                <?php if ($rekomendasi['kode'] === 'dua_tombol'): ?>
+                                                    <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank" class="btn-action btn-danger">File SP</a>
+                                                    <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank" class="btn-action btn-warning">File Tagihan</a>
+
+                                                <?php elseif ($rekomendasi['kode'] === 'sp1'): ?>
+                                                    <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank" class="btn-action btn-delete ?>"> 
+                                                        <?= $rekomendasi['label'] ?> 
+                                                    </a>
+
+                                                <?php elseif ($rekomendasi['kode'] === 'tagihan'): ?>
+                                                    <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank" class="btn-action btn-<?= $rekomendasi['color'] ?>"> 
+                                                        <?= $rekomendasi['label'] ?> 
+                                                    </a>
+                                                <?php endif; 
+                                            endwhile;
+                                        endif;
+                                    ?>
+                                <?php endif; ?>
+                                <!-- <a href="../config/cetak-sp.php?id=<?= $id_jukir ?>&kode=<?= $rekomendasi['kode'] ?>" target="_blank"
                                     class="btn-action btn-delete">
                                     <?= $rekomendasi['label'] ?>
-                                </a>
+                                </a> -->
                             </table>
                         </div>
                     </div>
