@@ -656,7 +656,7 @@ include '../api/fetch_jukir.php';
         function hapusJukir(type, id, nama) {
             let role = type === 'utama' ? 'Jukir Utama' : 'Jukir Pembantu';
             let warningText = type === 'utama' ?
-                `Apakah Anda yakin ingin menghapus <b>${nama}</b>?<br><br><span style="color:#ef4444;">Peringatan: Seluruh Jukir Pembantu yang terkait juga akan ikut terhapus!</span>` :
+                `Apakah Anda yakin ingin menghapus <b>${nama}</b>?<br><br><span style="color:#ef4444;">Peringatan: Seluruh Petugas Pembantu yang terkait juga akan ikut terhapus!</span>` :
                 `Apakah Anda yakin ingin menghapus <b>${nama}</b>?`;
 
             Swal.fire({

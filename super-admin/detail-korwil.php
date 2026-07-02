@@ -61,7 +61,7 @@ include '../api/fetch_korwil.php';
                         <i class="fas fa-user-tie"></i>
                     </div>
                     <div>
-                        <p style="margin: 0; color: #64748b; font-size: 13px; font-weight: 600;">Jukir Utama</p>
+                        <p style="margin: 0; color: #64748b; font-size: 13px; font-weight: 600;">Petugas Parkir Utama</p>
                         <h3 style="margin: 0; font-size: 24px; color: #1e293b; font-weight: 800;"><?= $jumlah_jukir_utama['total_jukir_utama'] ?> <span style="font-size: 14px; font-weight: 600; color: #94a3b8;">Orang</span></h3>
                     </div>
                 </div>
@@ -70,7 +70,7 @@ include '../api/fetch_korwil.php';
                         <i class="fas fa-users"></i>
                     </div>
                     <div>
-                        <p style="margin: 0; color: #64748b; font-size: 13px; font-weight: 600;">Jukir Pembantu</p>
+                        <p style="margin: 0; color: #64748b; font-size: 13px; font-weight: 600;">Petugas Parkir Pembantu</p>
                         <h3 style="margin: 0; font-size: 24px; color: #1e293b; font-weight: 800;"><?= $jumlah_jukir_pembantu['total_jukir_pembantu'] ?> <span style="font-size: 14px; font-weight: 600; color: #94a3b8;">Orang</span></h3>
                     </div>
                 </div>
@@ -84,7 +84,7 @@ include '../api/fetch_korwil.php';
                     <table class="custom-table w-full whitespace-nowrap">
                         <thead>
                             <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                                <th style="padding: 12px 24px; text-transform: uppercase; font-size: 12px; color: #64748b;">Nama Jukir Utama</th>
+                                <th style="padding: 12px 24px; text-transform: uppercase; font-size: 12px; color: #64748b;">Nama Petugas Parkir Utama</th>
                                 <th style="padding: 12px 24px; text-transform: uppercase; font-size: 12px; color: #64748b;">NIK</th>
                                 <th style="padding: 12px 24px; text-transform: uppercase; font-size: 12px; color: #64748b;">Lokasi Penugasan</th>
                                 <th style="padding: 12px 24px; text-transform: uppercase; font-size: 12px; color: #64748b;">No. Telp</th>
@@ -116,8 +116,8 @@ include '../api/fetch_korwil.php';
                     <table class="custom-table w-full whitespace-nowrap">
                         <thead>
                             <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                                <th style="padding: 12px 24px; text-transform: uppercase; font-size: 12px; color: #64748b;">Nama Jukir Pembantu</th>
-                                <th style="padding: 12px 24px; text-transform: uppercase; font-size: 12px; color: #64748b;">Membantu Jukir</th>
+                                <th style="padding: 12px 24px; text-transform: uppercase; font-size: 12px; color: #64748b;">Nama Petugas Parkir Pembantu</th>
+                                <th style="padding: 12px 24px; text-transform: uppercase; font-size: 12px; color: #64748b;">Membantu Petugas</th>
                                 <th style="padding: 12px 24px; text-transform: uppercase; font-size: 12px; color: #64748b;">Alamat</th>
                             </tr>
                         </thead>

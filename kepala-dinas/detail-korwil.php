@@ -31,12 +31,12 @@ include '../api/fetch_korwil.php';
                     </p>
                 </div>
 
-                <h3 style="color: var(--sidebar-bg);">Daftar Jukir Utama & Lokasi</h3>
+                <h3 style="color: var(--sidebar-bg);">Daftar Petugas Parkir Utama & Lokasi</h3>
                 <div class="table-container" style="margin-bottom: 30px;">
                     <table>
                         <thead>
                             <tr>
-                                <th>Nama Jukir Utama</th>
+                                <th>Nama Petugas Parkir Utama</th>
                                 <th>NIK</th>
                                 <th>Lokasi Penugasan</th>
                                 <th>No. Telp</th>
@@ -57,13 +57,13 @@ include '../api/fetch_korwil.php';
                     </table>
                 </div>
 
-                <h3 style="color: var(--sidebar-bg);">Daftar Jukir Pembantu</h3>
+                <h3 style="color: var(--sidebar-bg);">Daftar Petugas Parkir Pembantu</h3>
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th>Nama Jukir Pembantu</th>
-                                <th>Membantu Jukir</th>
+                                <th>Nama Petugas Parkir Pembantu</th>
+                                <th>Membantu Petugas</th>
                                 <th>Alamat</th>
                             </tr>
                         </thead>

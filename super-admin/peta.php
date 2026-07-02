@@ -55,7 +55,7 @@ include '../api/fetch_peta.php';
                 <h4 style="margin:0 0 8px 0; color:#1e1b4b; font-weight:700; font-size:14px;">${item.nama_lokasi}</h4>
                 <table style="width:100%; font-size:12px; border-collapse: collapse; color: #475569;">
                     <tr><td style="padding:3px 0;"><b style="color:#0f172a;">QRIS</b></td><td>: ${item.kode_qris}</td></tr>
-                    <tr><td style="padding:3px 0;"><b style="color:#0f172a;">Jukir</b></td><td>: ${item.jukir_utama || '-'}</td></tr>
+                    <tr><td style="padding:3px 0;"><b style="color:#0f172a;">Petugas Parkir</b></td><td>: ${item.jukir_utama || '-'}</td></tr>
                     <tr><td style="padding:3px 0;"><b style="color:#0f172a;">Target</b></td><td>: Rp ${Number(item.target_bulanan).toLocaleString('id-ID')}</td></tr>
                 </table>
                 <hr style="margin:10px 0; border:0; border-top:1px solid #e2e8f0;">

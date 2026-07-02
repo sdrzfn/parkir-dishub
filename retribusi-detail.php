@@ -17,7 +17,7 @@ $res_jukir = mysqli_query($conn, $query_jukir);
 $d = mysqli_fetch_assoc($res_jukir);
 
 if (!$d) {
-    redirectBack('retribusi-parkir.php', ['status' => 'error', 'msg' => 'Data Jukir tidak ditemukan.']);
+    redirectBack('retribusi-parkir.php', ['status' => 'error', 'msg' => 'Data Petugas tidak ditemukan.']);
     exit;
 }
 
@@ -56,7 +56,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
             <div class="header-section">
                 <div class="header-title-box">
                     <h2 style="font-size: 1.5rem; font-weight: 800; color: #1e293b; margin: 0;">Detail Retribusi
-                        Jukir</h2>
+                        Petugas Parkir</h2>
                 </div>
                 <button onclick="openModal()" class="btn-add-manual">
                     + Tambah Setoran Manual
@@ -65,7 +65,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
 
             <?php if ($rekomendasi): ?>
                 <div class="alert-card <?= $rekomendasi['color'] === 'danger' ? 'danger' : 'warning' ?>">
-                    <h4 class="alert-card-title"><i class="fas fa-magic"></i> Jukir Perlu Diproses</h4>
+                    <h4 class="alert-card-title"><i class="fas fa-magic"></i> Petugas Parkir Perlu Diproses</h4>
                     <p class="alert-card-desc">
                         Klik tombol di bawah untuk men-generate <b>Surat Peringatan</b> & <b>Surat Penagihan</b> secara
                         otomatis sesuai data bulan ini.
@@ -180,7 +180,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                             style="background: #f0fdf4; padding: 12px; border-radius: 8px; border-left: 4px solid #10b981;">
                             <span
                                 style="font-size: 11px; color: #166534; display: block; font-weight: 600; text-transform: uppercase;">Hak
-                                Imbal Jasa Jukir (40%)</span>
+                                Imbal Jasa Petugas (40%)</span>
                             <span style="font-size: 15px; color: #15803d; font-weight: 700;">
                                 Rp
                                 <?= number_format($imbal_jasa, 0, ',', '.') ?>

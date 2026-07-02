@@ -136,7 +136,7 @@ $q_live_feed = mysqli_query($conn, "SELECT
                     <div class="flex items-center gap-2">
                         <i class="far fa-user text-[#888] text-[16px]"></i>
                         <span class="text-[1.25rem] font-bold leading-none tracking-tighter text-slate-800"><?= $counts['total_jukir'] ?></span>
-                        <span class="text-[10px] text-[#888] font-semibold uppercase mt-0.5">Jukir</span>
+                        <span class="text-[10px] text-[#888] font-semibold uppercase mt-0.5">Petugas Parkir</span>
                     </div>
                     <div class="w-px h-5 bg-[#e0e0e0] hidden sm:block"></div>
                     <div class="flex items-center gap-2">
@@ -314,7 +314,7 @@ $q_live_feed = mysqli_query($conn, "SELECT
             <div class="col-span-12 md:col-span-5 lg:col-span-4">
                 <div class="bg-white rounded-[16px] p-5 border border-[rgba(0,0,0,0.06)] shadow-floating flex flex-col" style="height: clamp(300px, 35vw, 360px);">
                     <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-[16px] lg:text-[18px] font-medium tracking-tight text-slate-800">Top 5 Jukir (Bulan Ini)</h3>
+                        <h3 class="text-[16px] lg:text-[18px] font-medium tracking-tight text-slate-800">Top 5 Petugas Parkir (Bulan Ini)</h3>
                         <i class="fas fa-medal text-[14px] text-brand-500"></i>
                     </div>
                     <div class="flex flex-col flex-1 overflow-y-auto pr-2" style="scrollbar-width: thin;">
@@ -548,7 +548,7 @@ $q_live_feed = mysqli_query($conn, "SELECT
                             }).addTo(map).bindPopup(`
                                 <div style="font-family: 'Inter', sans-serif;">
                                     <strong style="display:block; margin-bottom:4px; color:#1e1b4b;">${loc.nama}</strong>
-                                    <small style="color: #64748b;">Jukir: ${loc.jukir_utama || 'Tidak ada data'}</small>
+                                    <small style="color: #64748b;">Petugas Parkir: ${loc.jukir_utama || 'Tidak ada data'}</small>
                                 </div>
                             `);
                         }

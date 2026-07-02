@@ -110,7 +110,7 @@ include '../api/fetch_lokasi.php';
                         <th>Foto</th>
                         <th class="hidden md:table-cell">Kode QRIS</th>
                         <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Lokasi</th>
-                        <th class="col-hide-mobile">Jukir Utama</th>
+                        <th class="col-hide-mobile">Petugas Parkir Utama</th>
                         <th class="hidden md:table-cell">Target Bulanan</th>
                         <th class="hidden md:table-cell">Target Harian</th>
                         <!-- <th style="text-align:center;">Aksi</th> -->

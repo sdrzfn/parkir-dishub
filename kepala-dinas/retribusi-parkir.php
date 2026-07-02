@@ -88,7 +88,7 @@ $tables_config = [
                 <div class="filter-search-wrapper">
                     <i class="fas fa-search filter-search-icon"></i>
                     <input type="text" name="search" class="filter-search-input"
-                        placeholder="Cari Jukir, Lokasi, atau QRIS..." value="<?= htmlspecialchars($search ?? '') ?>">
+                        placeholder="Cari Petugas Parkir, Lokasi, atau QRIS..." value="<?= htmlspecialchars($search ?? '') ?>">
                 </div>
 
                 <select name="kecamatan" class="filter-select" style="max-width: 200px;">
@@ -143,7 +143,7 @@ $tables_config = [
                         <thead>
                             <tr>
                                 <th style="width: 50px;">No</th>
-                                <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Jukir
+                                <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Petugas Parkir
                                     (Utama/Pembantu)</th>
                                 <th>Lokasi</th>
                                 <th class="hidden md:table-cell">Realisasi</th>
@@ -234,7 +234,7 @@ $tables_config = [
                                                     <table class="table-inner">
                                                         <thead>
                                                             <tr>
-                                                                <th>Nama Jukir Pembantu</th>
+                                                                <th>Nama Petugas Parkir Pembantu</th>
                                                                 <th>NIK</th>
                                                                 <th>Alamat</th>
                                                             </tr>
@@ -260,7 +260,7 @@ $tables_config = [
                                                         </tbody>
                                                     </table>
                                                 <?php else: ?>
-                                                    <p class="no-data">Tidak ada jukir pembantu terdaftar.</p>
+                                                    <p class="no-data">Tidak ada petugas pembantu terdaftar.</p>
                                                 <?php endif; ?>
                                             </div>
                                         </td>
