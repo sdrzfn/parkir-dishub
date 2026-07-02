@@ -2,3 +2,7 @@
 fontawesome/
 
 /vendor/
+/uploads/
+.env
+/data-cleaning/
+/notes/
