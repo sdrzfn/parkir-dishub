@@ -25,7 +25,7 @@ include '../api/fetch_lokasi.php';
                 <h1 class="page-title">Data Lokasi Parkir</h1>
                 <p class="page-subtitle">Manajemen titik parkir dan target retribusi</p>
             </div>
-            <button class="btn-primary" onclick="openTambahModal()">+ Tambah Lokasi</button>
+            <!-- <button class="btn-primary" onclick="openTambahModal()">+ Tambah Lokasi</button> -->
         </div>
 
         <form method="GET" action="">
@@ -48,16 +48,34 @@ include '../api/fetch_lokasi.php';
                 <hr class="filter-divider">
                 <div class="filter-controls-row">
                     <div class="filter-field">
-                        <label for="filter-wilayah">Koordinator Wilayah</label>
+                        <label for="filter-wilayah">Kecamatan</label>
                         <select name="kecamatan" class="filter-select">
-                            <option value="">Semua Wilayah</option>
-                            <option value="Sidoarjo 1" <?= $kecamatan == 'Sidoarjo 1' ? 'selected' : '' ?>>Sidoarjo
-                                1</option>
-                            <option value="Sidoarjo 2" <?= $kecamatan == 'Sidoarjo 2' ? 'selected' : '' ?>>Sidoarjo
-                                2</option>
-                            <option value="Waru" <?= $kecamatan == 'Waru' ? 'selected' : '' ?>>Waru</option>
-                            <option value="Porong" <?= $kecamatan == 'Porong' ? 'selected' : '' ?>>Porong</option>
-                            <option value="Krian" <?= $kecamatan == 'Krian' ? 'selected' : '' ?>>Krian</option>
+                            <option value="">Semua Kecamatan</option>
+                            <?php
+                            $list_kecamatan = [
+                                'Balongbendo',
+                                'Taman',
+                                'Buduran',
+                                'Porong',
+                                'Tanggulangin',
+                                'Candi',
+                                'Prambon',
+                                'Tarik',
+                                'Gedangan',
+                                'Sedati',
+                                'Tulangan',
+                                'Jabon',
+                                'Sidoarjo',
+                                'Waru',
+                                'Krembung',
+                                'Sukodono',
+                                'Wonoayu'
+                            ];
+                            foreach ($list_kecamatan as $kec):
+                                $selected = ($kecamatan === $kec) ? 'selected' : '';
+                                echo "<option value='$kec' $selected>$kec</option>";
+                            endforeach;
+                            ?>
                         </select>
                     </div>
                     <div class="filter-field">
@@ -93,8 +111,9 @@ include '../api/fetch_lokasi.php';
                         <th class="hidden md:table-cell">Kode QRIS</th>
                         <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Lokasi</th>
                         <th class="col-hide-mobile">Jukir Utama</th>
-                        <th class="hidden md:table-cell">Target</th>
-                        <th style="text-align:center;">Aksi</th>
+                        <th class="hidden md:table-cell">Target Bulanan</th>
+                        <th class="hidden md:table-cell">Target Harian</th>
+                        <!-- <th style="text-align:center;">Aksi</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -102,7 +121,7 @@ include '../api/fetch_lokasi.php';
                         <?php while ($row = mysqli_fetch_assoc($result)): ?>
                             <tr>
                                 <td data-label="Foto">
-                                    <?php $foto = !empty($row['foto']) ? '../assets/img/lokasi/' . $row['foto'] : '../assets/img/no-image.jpg'; ?>
+                                    <?php $foto = !empty($row['foto']) ? 'assets/img/lokasi/' . $row['foto'] : 'assets/img/no-image.jpg'; ?>
                                     <img src="<?= $foto ?>" class="img-thumbnail">
                                 </td>
                                 <td data-label="Kode QRIS" class="hidden md:table-cell"
@@ -123,13 +142,16 @@ include '../api/fetch_lokasi.php';
                                 <td data-label="Target Bulanan" class="text-nominal hidden md:table-cell">
                                     Rp <?= number_format($row['target_bulanan'], 0, ',', '.') ?>
                                 </td>
-                                <td data-label="Aksi" style="text-align:center;">
+                                <td data-label="Target Bulanan" class="text-nominal hidden md:table-cell">
+                                    Rp <?= number_format($row['target_harian'], 0, ',', '.') ?>
+                                </td>
+                                <!-- <td data-label="Aksi" style="text-align:center;">
                                     <button class="btn-action btn-edit"
                                         onclick='openEditModal(<?= json_encode($row) ?>)'>Edit</button>
-                                    <a href="../store/proses_lokasi.php?action=delete&id=<?= $row['id'] ?>"
+                                    <a href="store/proses_lokasi.php?action=delete&id=<?= $row['id'] ?>"
                                         class="btn-action btn-delete"
                                         onclick="return konfirmasiHapus(event, this.href)">Hapus</a>
-                                </td>
+                                </td> -->
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
@@ -187,7 +209,7 @@ include '../api/fetch_lokasi.php';
         <div class="modal-content">
             <button type="button" onclick="closeModal()" class="btn-close-modal" aria-label="Tutup Modal"><i
                     class="fas fa-times"></i></button>
-            <form id="formLokasi" action="../store/proses_lokasi.php?action=add" method="POST"
+            <form id="formLokasi" action="store/proses_lokasi.php?action=add" method="POST"
                 enctype="multipart/form-data">
                 <div class="modal-header">
                     <h3 id="modalTitle" style="margin: 0; font-weight: 700; color: var(--text-main);">Tambah Lokasi
@@ -239,6 +261,18 @@ include '../api/fetch_lokasi.php';
                         </select>
                     </div>
 
+                    <div class="form-group">
+                        <label>Kecamatan Wilayah</label>
+                        <select name="kecamatan" id="form_kecamatan" class="form-control" required>
+                            <option value="">-- Pilih Kecamatan --</option>
+                            <?php
+                            foreach ($list_kecamatan as $kec) {
+                                echo "<option value='$kec'>$kec</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+
                     <div style="display: flex; gap: 15px;">
                         <div class="form-group" style="flex: 1;">
                             <label>Nominal Retribusi (Rp)</label>
@@ -255,6 +289,10 @@ include '../api/fetch_lokasi.php';
                             <label>Target Bulanan (Rp)</label>
                             <input type="number" name="target_bulanan" id="target_bulanan" class="form-control"
                                 required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Target Harian (Rp)</label>
+                            <input type="number" name="target_harian" id="target_harian" class="form-control" required>
                         </div>
                     </div>
 
@@ -316,7 +354,7 @@ include '../api/fetch_lokasi.php';
 
         function openTambahModal() {
             form.reset();
-            form.action = '../store/proses_lokasi.php?action=add';
+            form.action = 'store/proses_lokasi.php?action=add';
             title.innerText = 'Tambah Lokasi Parkir';
             document.getElementById('id_field').value = '';
             document.getElementById('info_foto').style.display = 'none';
@@ -327,7 +365,7 @@ include '../api/fetch_lokasi.php';
 
         function openEditModal(data) {
             form.reset();
-            form.action = '../store/proses_lokasi.php?action=edit';
+            form.action = 'store/proses_lokasi.php?action=edit';
             title.innerText = 'Edit Lokasi Parkir';
 
             document.getElementById('id_field').value = data.id;
@@ -336,10 +374,12 @@ include '../api/fetch_lokasi.php';
             document.getElementById('titik_parkir').value = data.titik_parkir;
             document.getElementById('nominal_retribusi').value = data.nominal_retribusi;
             document.getElementById('target_bulanan').value = data.target_bulanan;
+            document.getElementById('target_harian').value = data.target_harian;
             document.getElementById('terbilang_target').value = data.terbilang_target;
             document.getElementById('foto_lama_field').value = data.foto;
             document.getElementById('form_lat').value = data.latitude || '';
             document.getElementById('form_lng').value = data.longitude || '';
+            document.getElementById('form_kecamatan').value = data.kecamatan;
 
             modal.style.display = 'flex';
             initMapPicker(data.latitude, data.longitude);

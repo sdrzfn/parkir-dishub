@@ -13,177 +13,207 @@ include 'api/fetch_lokasi.php';
 
 <?php include 'components/header.php'; ?>
 
-<body class="font-sans text-slate-800 antialiased min-h-screen pt-24" style="background: radial-gradient(100% 100% at 100% 0%, #fef3c7 0%, #f8fafc 100%);">
+<body class="font-sans text-slate-800 antialiased min-h-screen pt-24"
+    style="background: radial-gradient(100% 100% at 100% 0%, #fef3c7 0%, #f8fafc 100%);">
 
     <?php include 'components/navbar.php'; ?>
 
     <main class="container mx-auto" style="max-width:1400px;">
-                <?php include 'components/breadcrumb.php'; ?>
-                <div class="page-header">
-                    <div>
-                        <h1 class="page-title">Data Lokasi Parkir</h1>
-                        <p class="page-subtitle">Manajemen titik parkir dan target retribusi</p>
+        <?php include 'components/breadcrumb.php'; ?>
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Data Lokasi Parkir</h1>
+                <p class="page-subtitle">Manajemen titik parkir dan target retribusi</p>
+            </div>
+            <button class="btn-primary" onclick="openTambahModal()">+ Tambah Lokasi</button>
+        </div>
+
+        <form method="GET" action="">
+            <div class="filter-panel">
+                <div class="filter-search-row">
+                    <div class="filter-search-wrapper">
+                        <span class="filter-search-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                        </span>
+                        <input type="text" name="search" class="filter-search-input"
+                            value="<?= htmlspecialchars($search) ?>" placeholder="Cari kode QRIS atau nama lokasi..."
+                            autocomplete="off">
                     </div>
-                    <button class="btn-primary" onclick="openTambahModal()">+ Tambah Lokasi</button>
+                    <button type="submit" class="filter-btn-search">Cari</button>
+                </div>
+                <hr class="filter-divider">
+                <div class="filter-controls-row">
+                    <div class="filter-field">
+                        <label for="filter-wilayah">Kecamatan</label>
+                        <select name="kecamatan" class="filter-select">
+                            <option value="">Semua Kecamatan</option>
+                            <?php
+                            $list_kecamatan = [
+                                'Balongbendo',
+                                'Taman',
+                                'Buduran',
+                                'Porong',
+                                'Tanggulangin',
+                                'Candi',
+                                'Prambon',
+                                'Tarik',
+                                'Gedangan',
+                                'Sedati',
+                                'Tulangan',
+                                'Jabon',
+                                'Sidoarjo',
+                                'Waru',
+                                'Krembung',
+                                'Sukodono',
+                                'Wonoayu'
+                            ];
+                            foreach ($list_kecamatan as $kec):
+                                $selected = ($kecamatan === $kec) ? 'selected' : '';
+                                echo "<option value='$kec' $selected>$kec</option>";
+                            endforeach;
+                            ?>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <label for="filter-titik">Titik Parkir</label>
+                        <select name="titik_parkir" id="filter-titik" class="filter-select">
+                            <option value="">Semua Titik</option>
+                            <option value="TJU" <?= $titik_parkir === 'TJU' ? 'selected' : '' ?>>TJU</option>
+                            <option value="TKP" <?= $titik_parkir === 'TKP' ? 'selected' : '' ?>>TKP</option>
+                        </select>
+                    </div>
                 </div>
 
-                <form method="GET" action="">
-                    <div class="filter-panel">
-                        <div class="filter-search-row">
-                            <div class="filter-search-wrapper">
-                                <span class="filter-search-icon">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="11" cy="11" r="8" />
-                                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                                    </svg>
-                                </span>
-                                <input type="text" name="search" class="filter-search-input"
-                                    value="<?= htmlspecialchars($search) ?>"
-                                    placeholder="Cari kode QRIS atau nama lokasi..." autocomplete="off">
-                            </div>
-                            <button type="submit" class="filter-btn-search">Cari</button>
-                        </div>
-                        <hr class="filter-divider">
-                        <div class="filter-controls-row">
-                            <div class="filter-field">
-                                <label for="filter-wilayah">Koordinator Wilayah</label>
-                                <select name="kecamatan" class="filter-select">
-                                    <option value="">Semua Wilayah</option>
-                                    <option value="Sidoarjo 1" <?= $kecamatan == 'Sidoarjo 1' ? 'selected' : '' ?>>Sidoarjo
-                                        1</option>
-                                    <option value="Sidoarjo 2" <?= $kecamatan == 'Sidoarjo 2' ? 'selected' : '' ?>>Sidoarjo
-                                        2</option>
-                                    <option value="Waru" <?= $kecamatan == 'Waru' ? 'selected' : '' ?>>Waru</option>
-                                    <option value="Porong" <?= $kecamatan == 'Porong' ? 'selected' : '' ?>>Porong</option>
-                                    <option value="Krian" <?= $kecamatan == 'Krian' ? 'selected' : '' ?>>Krian</option>
-                                </select>
-                            </div>
-                            <div class="filter-field">
-                                <label for="filter-titik">Titik Parkir</label>
-                                <select name="titik_parkir" id="filter-titik" class="filter-select">
-                                    <option value="">Semua Titik</option>
-                                    <option value="TJU" <?= $titik_parkir === 'TJU' ? 'selected' : '' ?>>TJU</option>
-                                    <option value="TKP" <?= $titik_parkir === 'TKP' ? 'selected' : '' ?>>TKP</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="filter-footer">
-                            <p class="filter-result-info">
-                                Menampilkan <strong>
-                                    <?= number_format($total_row) ?>
-                                </strong> lokasi
-                                <?php if ($search !== '' || $kecamatan !== '' || $titik_parkir !== ''): ?>
-                                    <span class="filter-active-badge">Filter aktif</span>
-                                <?php endif; ?>
-                            </p>
-                            <a href="lokasi.php" class="filter-btn-reset">↺ Reset</a>
-                        </div>
-                    </div>
-                </form>
-
-                <div class="table-container relative max-h-[65vh] overflow-y-auto overflow-x-auto w-full rounded-xl border border-slate-200 shadow-sm mt-4">
-                    <table class="custom-table w-full whitespace-nowrap">
-                        <thead>
-                            <tr>
-                                <th>Foto</th>
-                                <th class="hidden md:table-cell">Kode QRIS</th>
-                                <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Lokasi</th>
-                                <th class="col-hide-mobile">Jukir Utama</th>
-                                <th class="hidden md:table-cell">Target</th>
-                                <th style="text-align:center;">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (mysqli_num_rows($result) > 0): ?>
-                                <?php while ($row = mysqli_fetch_assoc($result)): ?>
-                                    <tr>
-                                        <td data-label="Foto">
-                                            <?php $foto = !empty($row['foto']) ? 'assets/img/lokasi/' . $row['foto'] : 'assets/img/no-image.jpg'; ?>
-                                            <img src="<?= $foto ?>" class="img-thumbnail">
-                                        </td>
-                                        <td data-label="Kode QRIS" class="hidden md:table-cell" style="font-weight:600; font-size:0.82rem;"><?= $row['kode_qris'] ?></td>
-                                        <td data-label="Nama Lokasi" class="sticky left-0 bg-white z-10 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">
-                                            <div class="truncate max-w-[200px]" title="<?= htmlspecialchars($row['nama_lokasi']) ?>">
-                                                <?= htmlspecialchars($row['nama_lokasi']) ?>
-                                            </div>
-                                            <span class="label-ptk"><?= $row['titik_parkir'] ?></span>
-                                        </td>
-                                        <td data-label="Nama Jukir" class="col-hide-mobile">
-                                            <div class="truncate max-w-[150px]" title="<?= htmlspecialchars($row['nama_jukir'] ?? 'Belum diset') ?>">
-                                                <?= $row['nama_jukir'] ?? '<span class="no-data">Belum diset</span>' ?>
-                                            </div>
-                                        </td>
-                                        <td data-label="Target Bulanan" class="text-nominal hidden md:table-cell">
-                                            Rp <?= number_format($row['target_bulanan'], 0, ',', '.') ?>
-                                        </td>
-                                        <td data-label="Aksi" style="text-align:center;">
-                                            <button class="btn-action btn-edit"
-                                                onclick='openEditModal(<?= json_encode($row) ?>)'>Edit</button>
-                                            <a href="store/proses_lokasi.php?action=delete&id=<?= $row['id'] ?>"
-                                                class="btn-action btn-delete"
-                                                onclick="return konfirmasiHapus(event, this.href)">Hapus</a>
-                                        </td>
-                                    </tr>
-                                <?php endwhile; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="6" style="padding:40px; text-align:center; color:#94a3b8;">
-                                        Data tidak ditemukan.
-                                    </td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="flex items-center justify-between mt-6 px-4">
-                    <p class="text-sm text-slate-500">
-                        Menampilkan halaman <span class="font-medium text-slate-900"><?= $page ?></span> dari <span class="font-medium text-slate-900"><?= max(1, $total_pages) ?></span>
+                <div class="filter-footer">
+                    <p class="filter-result-info">
+                        Menampilkan <strong>
+                            <?= number_format($total_row) ?>
+                        </strong> lokasi
+                        <?php if ($search !== '' || $kecamatan !== '' || $titik_parkir !== ''): ?>
+                            <span class="filter-active-badge">Filter aktif</span>
+                        <?php endif; ?>
                     </p>
-                    <nav class="flex items-center gap-2" aria-label="Pagination">
-                        <?php
-                        $query_params = http_build_query([
-                            'search' => $search,
-                            'kecamatan' => $kecamatan,
-                            'titik_parkir' => $titik_parkir,
-                        ]);
-                        ?>
-                        
-                        <!-- Previous Button -->
-                        <a href="<?= $page > 1 ? '?page=' . ($page - 1) . '&' . $query_params : '#' ?>" 
-                           class="px-3 py-2 rounded-lg text-sm font-medium transition-colors <?= $page > 1 ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed pointer-events-none' ?>"
-                           aria-disabled="<?= $page <= 1 ? 'true' : 'false' ?>">
-                            &larr; Sebelumnya
-                        </a>
-
-                        <!-- Page Numbers -->
-                        <div class="flex items-center gap-1 hidden sm:flex">
-                            <?php for ($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++): ?>
-                                <a href="?page=<?= $i ?>&<?= $query_params ?>" 
-                                   class="w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors <?= ($page == $i) ? 'bg-brand-950 text-white' : 'text-slate-600 hover:bg-slate-100' ?>">
-                                    <?= $i ?>
-                                </a>
-                            <?php endfor; ?>
-                        </div>
-
-                        <!-- Next Button -->
-                        <a href="<?= $page < $total_pages ? '?page=' . ($page + 1) . '&' . $query_params : '#' ?>" 
-                           class="px-3 py-2 rounded-lg text-sm font-medium transition-colors <?= $page < $total_pages ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed pointer-events-none' ?>"
-                           aria-disabled="<?= $page >= $total_pages ? 'true' : 'false' ?>">
-                            Selanjutnya &rarr;
-                        </a>
-                    </nav>
+                    <a href="lokasi.php" class="filter-btn-reset">↺ Reset</a>
                 </div>
+            </div>
+        </form>
+
+        <div
+            class="table-container relative max-h-[65vh] overflow-y-auto overflow-x-auto w-full rounded-xl border border-slate-200 shadow-sm mt-4">
+            <table class="custom-table w-full whitespace-nowrap">
+                <thead>
+                    <tr>
+                        <th>Foto</th>
+                        <th class="hidden md:table-cell">Kode QRIS</th>
+                        <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Lokasi</th>
+                        <th class="col-hide-mobile">Jukir Utama</th>
+                        <th class="hidden md:table-cell">Target Bulanan</th>
+                        <th class="hidden md:table-cell">Target Harian</th>
+                        <th style="text-align:center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (mysqli_num_rows($result) > 0): ?>
+                        <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                            <tr>
+                                <td data-label="Foto">
+                                    <?php $foto = !empty($row['foto']) ? 'assets/img/lokasi/' . $row['foto'] : 'assets/img/no-image.jpg'; ?>
+                                    <img src="<?= $foto ?>" class="img-thumbnail">
+                                </td>
+                                <td data-label="Kode QRIS" class="hidden md:table-cell"
+                                    style="font-weight:600; font-size:0.82rem;"><?= $row['kode_qris'] ?></td>
+                                <td data-label="Nama Lokasi"
+                                    class="sticky left-0 bg-white z-10 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">
+                                    <div class="truncate max-w-[200px]" title="<?= htmlspecialchars($row['nama_lokasi']) ?>">
+                                        <?= htmlspecialchars($row['nama_lokasi']) ?>
+                                    </div>
+                                    <span class="label-ptk"><?= $row['titik_parkir'] ?></span>
+                                </td>
+                                <td data-label="Nama Jukir" class="col-hide-mobile">
+                                    <div class="truncate max-w-[150px]"
+                                        title="<?= htmlspecialchars($row['nama_jukir'] ?? 'Belum diset') ?>">
+                                        <?= $row['nama_jukir'] ?? '<span class="no-data">Belum diset</span>' ?>
+                                    </div>
+                                </td>
+                                <td data-label="Target Bulanan" class="text-nominal hidden md:table-cell">
+                                    Rp <?= number_format($row['target_bulanan'], 0, ',', '.') ?>
+                                </td>
+                                <td data-label="Target Bulanan" class="text-nominal hidden md:table-cell">
+                                    Rp <?= number_format($row['target_harian'], 0, ',', '.') ?>
+                                </td>
+                                <td data-label="Aksi" style="text-align:center;">
+                                    <button class="btn-action btn-edit"
+                                        onclick='openEditModal(<?= json_encode($row) ?>)'>Edit</button>
+                                    <a href="store/proses_lokasi.php?action=delete&id=<?= $row['id'] ?>"
+                                        class="btn-action btn-delete"
+                                        onclick="return konfirmasiHapus(event, this.href)">Hapus</a>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6" style="padding:40px; text-align:center; color:#94a3b8;">
+                                Data tidak ditemukan.
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="flex items-center justify-between mt-6 px-4">
+            <p class="text-sm text-slate-500">
+                Menampilkan halaman <span class="font-medium text-slate-900"><?= $page ?></span> dari <span
+                    class="font-medium text-slate-900"><?= max(1, $total_pages) ?></span>
+            </p>
+            <nav class="flex items-center gap-2" aria-label="Pagination">
+                <?php
+                $query_params = http_build_query([
+                    'search' => $search,
+                    'kecamatan' => $kecamatan,
+                    'titik_parkir' => $titik_parkir,
+                ]);
+                ?>
+
+                <!-- Previous Button -->
+                <a href="<?= $page > 1 ? '?page=' . ($page - 1) . '&' . $query_params : '#' ?>"
+                    class="px-3 py-2 rounded-lg text-sm font-medium transition-colors <?= $page > 1 ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed pointer-events-none' ?>"
+                    aria-disabled="<?= $page <= 1 ? 'true' : 'false' ?>">
+                    &larr; Sebelumnya
+                </a>
+
+                <!-- Page Numbers -->
+                <div class="flex items-center gap-1 hidden sm:flex">
+                    <?php for ($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++): ?>
+                        <a href="?page=<?= $i ?>&<?= $query_params ?>"
+                            class="w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors <?= ($page == $i) ? 'bg-brand-950 text-white' : 'text-slate-600 hover:bg-slate-100' ?>">
+                            <?= $i ?>
+                        </a>
+                    <?php endfor; ?>
+                </div>
+
+                <!-- Next Button -->
+                <a href="<?= $page < $total_pages ? '?page=' . ($page + 1) . '&' . $query_params : '#' ?>"
+                    class="px-3 py-2 rounded-lg text-sm font-medium transition-colors <?= $page < $total_pages ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed pointer-events-none' ?>"
+                    aria-disabled="<?= $page >= $total_pages ? 'true' : 'false' ?>">
+                    Selanjutnya &rarr;
+                </a>
+            </nav>
+        </div>
     </main>
 
     <div id="modalLokasi" class="modal">
         <div class="modal-content">
-            <button type="button" onclick="closeModal()" class="btn-close-modal" aria-label="Tutup Modal"><i class="fas fa-times"></i></button>
+            <button type="button" onclick="closeModal()" class="btn-close-modal" aria-label="Tutup Modal"><i
+                    class="fas fa-times"></i></button>
             <form id="formLokasi" action="store/proses_lokasi.php?action=add" method="POST"
                 enctype="multipart/form-data">
                 <div class="modal-header">
-                    <h3 id="modalTitle" style="margin: 0; font-weight: 700; color: var(--text-main);">Tambah Lokasi Parkir</h3>
+                    <h3 id="modalTitle" style="margin: 0; font-weight: 700; color: var(--text-main);">Tambah Lokasi
+                        Parkir</h3>
                 </div>
 
                 <div class="modal-body">
@@ -231,6 +261,18 @@ include 'api/fetch_lokasi.php';
                         </select>
                     </div>
 
+                    <div class="form-group">
+                        <label>Kecamatan Wilayah</label>
+                        <select name="kecamatan" id="form_kecamatan" class="form-control" required>
+                            <option value="">-- Pilih Kecamatan --</option>
+                            <?php
+                            foreach ($list_kecamatan as $kec) {
+                                echo "<option value='$kec'>$kec</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+
                     <div style="display: flex; gap: 15px;">
                         <div class="form-group" style="flex: 1;">
                             <label>Nominal Retribusi (Rp)</label>
@@ -247,6 +289,10 @@ include 'api/fetch_lokasi.php';
                             <label>Target Bulanan (Rp)</label>
                             <input type="number" name="target_bulanan" id="target_bulanan" class="form-control"
                                 required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Target Harian (Rp)</label>
+                            <input type="number" name="target_harian" id="target_harian" class="form-control" required>
                         </div>
                     </div>
 
@@ -328,10 +374,12 @@ include 'api/fetch_lokasi.php';
             document.getElementById('titik_parkir').value = data.titik_parkir;
             document.getElementById('nominal_retribusi').value = data.nominal_retribusi;
             document.getElementById('target_bulanan').value = data.target_bulanan;
+            document.getElementById('target_harian').value = data.target_harian;
             document.getElementById('terbilang_target').value = data.terbilang_target;
             document.getElementById('foto_lama_field').value = data.foto;
             document.getElementById('form_lat').value = data.latitude || '';
             document.getElementById('form_lng').value = data.longitude || '';
+            document.getElementById('form_kecamatan').value = data.kecamatan;
 
             modal.style.display = 'flex';
             initMapPicker(data.latitude, data.longitude);

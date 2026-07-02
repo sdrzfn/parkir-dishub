@@ -13,6 +13,7 @@ if ($action == 'add' || $action == 'edit') {
     $titik_parkir = mysqli_real_escape_string($conn, $_POST['titik_parkir']);
     $nominal_retribusi = (float) $_POST['nominal_retribusi'];
     $target_bulanan = (float) $_POST['target_bulanan'];
+    $target_harian = (float) $_POST['target_harian'];
     $terbilang_target = mysqli_real_escape_string($conn, $_POST['terbilang_target']);
     $latitude = $_POST['latitude'] !== "" ? "'" . mysqli_real_escape_string($conn, $_POST['latitude']) . "'" : "NULL";
     $longitude = $_POST['longitude'] !== "" ? "'" . mysqli_real_escape_string($conn, $_POST['longitude']) . "'" : "NULL";
@@ -40,12 +41,12 @@ if ($action == 'add' || $action == 'edit') {
     }
 
     if ($action == 'add') {
-        $sql = "INSERT INTO lokasi (kode_qris, nama_lokasi, titik_parkir, nominal_retribusi, target_bulanan, terbilang_target, foto, latitude, longitude) 
-                VALUES ('$kode_qris', '$nama_lokasi', '$titik_parkir', '$nominal_retribusi', '$target_bulanan', '$terbilang_target', '$nama_file_foto', $latitude, $longitude)";
+        $sql = "INSERT INTO lokasi (kode_qris, nama_lokasi, kecamatan, titik_parkir, nominal_retribusi, target_bulanan, target_harian, terbilang_target, foto, latitude, longitude) 
+            VALUES ('$kode_qris', '$nama_lokasi', '$kecamatan', '$titik_parkir', '$nominal_retribusi', '$target_bulanan', '$target_harian', '$terbilang_target', '$nama_file_foto', $latitude, $longitude)";
     } else {
         $sql = "UPDATE lokasi SET 
-                kode_qris='$kode_qris', nama_lokasi='$nama_lokasi', titik_parkir='$titik_parkir', 
-                nominal_retribusi='$nominal_retribusi', target_bulanan='$target_bulanan', 
+                kode_qris='$kode_qris', nama_lokasi='$nama_lokasi', kecamatan='$kecamatan', titik_parkir='$titik_parkir', 
+                nominal_retribusi='$nominal_retribusi', target_bulanan='$target_bulanan', target_harian='$target_harian',
                 terbilang_target='$terbilang_target', foto='$nama_file_foto', latitude=$latitude, 
                 longitude=$longitude 
                 WHERE id=$id";

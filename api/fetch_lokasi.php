@@ -21,7 +21,7 @@ if ($search !== '') {
 
 if ($kecamatan !== '') {
     $k = mysqli_real_escape_string($conn, $kecamatan);
-    $where_clauses[] = "kw.wilayah = '$k'";
+    $where_clauses[] = "l.kecamatan = '$k'";
 }
 
 if ($titik_parkir !== '') {
