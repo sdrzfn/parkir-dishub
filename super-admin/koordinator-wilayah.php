@@ -31,69 +31,70 @@ $result = mysqli_query($conn, $sql);
             </button>
         </div>
 
-        <div
-            class="table-container relative max-h-[65vh] overflow-y-auto overflow-x-auto w-full rounded-xl border border-slate-200 shadow-sm mt-4">
-            <table class="custom-table w-full whitespace-nowrap">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Wilayah</th>
-                        <th>Nama Koordinator</th>
-                        <th style="text-align: center;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    if (mysqli_num_rows($result) > 0):
-                        $no = 1;
-                        while ($row = mysqli_fetch_assoc($result)):
-                            ?>
+        <div class="table-container relative max-h-[65vh] overflow-y-auto overflow-x-auto w-full rounded-xl border border-slate-200 shadow-sm mt-4">
+                    <table class="custom-table w-full whitespace-nowrap">
+                        <thead>
                             <tr>
-                                <td data-label="No"><?= $no++; ?></td>
-                                <td data-label="Wilayah"
-                                    class="sticky left-0 bg-white z-10 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">
-                                    <strong><?= $row['wilayah']; ?></strong></td>
-                                <td data-label="Nama Koordinator">
-                                    <div class="truncate max-w-[200px]" title="<?= htmlspecialchars($row['nama_korwil']); ?>">
-                                        <?= $row['nama_korwil']; ?>
-                                    </div>
-                                </td>
-                                <td data-label="Aksi" style="text-align: center;">
-                                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                        <button class="btn-action btn-edit" onclick='openEditModal(<?= json_encode($row) ?>)'
-                                            style="padding: 6px 12px; font-weight: bold;">
-                                            <i class="fas fa-edit" style="margin-right: 4px;"></i> Edit
-                                        </button>
-                                        <button class="btn-action btn-delete"
-                                            onclick="hapusData(<?= $row['id']; ?>, '<?= htmlspecialchars($row['nama_korwil']); ?>')"
-                                            style="padding: 6px 12px; font-weight: bold;">
-                                            <i class="fas fa-trash" style="margin-right: 4px;"></i> Hapus
-                                        </button>
-                                        <a href="detail-korwil.php?id=<?= $row['id']; ?>" class="btn-action"
-                                            style="background: #0ea5e9; color: white; padding: 6px 12px; font-weight: bold; border-radius: 6px; text-decoration: none;">
-                                            <i class="fas fa-eye" style="margin-right: 4px;"></i> Detail
-                                        </a>
-                                    </div>
-                                </td>
+                                <th>No</th>
+                                <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Wilayah</th>
+                                <th>Nama Koordinator</th>
+                                <th>No. Telepon</th>
+                                <th>Email</th>
+                                <th style="text-align: center;">Aksi</th>
                             </tr>
-                        <?php
-                        endwhile;
-                    else:
-                        ?>
-                        <tr>
-                            <td colspan="4">
-                                <div class="empty-state">
-                                    <div class="empty-state-icon"><i class="fas fa-users"></i></div>
-                                    <p class="empty-state-title">Belum ada Koordinator Wilayah</p>
-                                    <p class="empty-state-desc">Silakan klik tombol "Tambah Koordinator" untuk menambahkan
-                                        data baru.</p>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+                        </thead>
+                        <tbody>
+                            <?php
+                            if (mysqli_num_rows($result) > 0):
+                                $no = 1;
+                                while ($row = mysqli_fetch_assoc($result)):
+                            ?>
+                                    <tr>
+                                        <td data-label="No"><?= $no++; ?></td>
+                                        <td data-label="Wilayah" class="sticky left-0 bg-white z-10 shadow-[2px_0_5px_rgba(0,0,0,0.05)]"><strong><?= $row['wilayah']; ?></strong></td>
+                                        <td data-label="Nama Koordinator">
+                                            <div class="truncate max-w-[200px]" title="<?= htmlspecialchars($row['nama_korwil']); ?>">
+                                                <?= $row['nama_korwil']; ?>
+                                            </div>
+                                        </td>
+                                        <td data-label="No. Telepon"><?= htmlspecialchars($row['no_telp'] ?? '-'); ?></td>
+                                        <td data-label="Email"><?= htmlspecialchars($row['email'] ?? '-'); ?></td>
+                                        <td data-label="Aksi" style="text-align: center;">
+                                            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                                <button class="btn-action btn-edit"
+                                                    onclick='openEditModal(<?= json_encode($row) ?>)'
+                                                    style="padding: 6px 12px; font-weight: bold;">
+                                                    <i class="fas fa-edit" style="margin-right: 4px;"></i> Edit
+                                                </button>
+                                                <button class="btn-action btn-delete"
+                                                    onclick="hapusData(<?= $row['id']; ?>, '<?= htmlspecialchars($row['nama_korwil']); ?>')"
+                                                    style="padding: 6px 12px; font-weight: bold;">
+                                                    <i class="fas fa-trash" style="margin-right: 4px;"></i> Hapus
+                                                </button>
+                                                <a href="detail-korwil.php?id=<?= $row['id']; ?>" class="btn-action"
+                                                    style="background: #0ea5e9; color: white; padding: 6px 12px; font-weight: bold; border-radius: 6px; text-decoration: none;">
+                                                    <i class="fas fa-eye" style="margin-right: 4px;"></i> Detail
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                            <?php 
+                                endwhile; 
+                            else: 
+                            ?>
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="empty-state">
+                                            <div class="empty-state-icon"><i class="fas fa-users"></i></div>
+                                            <p class="empty-state-title">Belum ada Koordinator Wilayah</p>
+                                            <p class="empty-state-desc">Silakan klik tombol "Tambah Koordinator" untuk menambahkan data baru.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
     </main>
 
     <!-- MODAL TAMBAH / EDIT KORWIL -->
