@@ -356,7 +356,7 @@ include 'api/fetch_jukir.php';
                                 <label>Lokasi Penugasan</label>
                                 <div class="custom-search-select" style="position: relative;">
                                     <input type="text" id="lokasi_search" class="form-control"
-                                        placeholder="Ketik kode QRIS / jalan..." autocomplete="off" required>
+                                        placeholder="Masukkan nama lokasi parkir..." autocomplete="off" required>
                                     <input type="hidden" name="id_lokasi" id="form_lokasi">
 
                                     <div id="lokasi_options_panel"
@@ -368,7 +368,7 @@ include 'api/fetch_jukir.php';
                                             <div class="lokasi-option-item" data-value="<?= $lok['id'] ?>"
                                                 data-search="<?= strtolower($lok['kode_qris'] . ' ' . $lok['nama_lokasi']) ?>"
                                                 style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem;">
-                                                <strong><?= $lok['kode_qris'] ?></strong> - <?= $lok['nama_lokasi'] ?>
+                                                <?= $lok['nama_lokasi'] ?>
                                             </div>
                                         <?php endwhile; ?>
 
