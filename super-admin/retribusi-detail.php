@@ -328,25 +328,29 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                                 </tbody>
                                 <?php if ($rekomendasi !== null):
                                     $q_log = mysqli_query($conn, "SELECT * FROM log_aksi_jukir WHERE id_jukir = $id_jukir ORDER BY tanggal_aksi DESC");
-                                        if (mysqli_num_rows($q_log) > 0):
-                                            while ($log = mysqli_fetch_assoc($q_log)):
+                                    if (mysqli_num_rows($q_log) > 0):
+                                        while ($log = mysqli_fetch_assoc($q_log)):
                                             ?>
-                                                <?php if ($rekomendasi['kode'] === 'dua_tombol'): ?>
-                                                    <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank" class="btn-action btn-danger">File SP</a>
-                                                    <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank" class="btn-action btn-warning">File Tagihan</a>
+                                            <?php if ($rekomendasi['kode'] === 'dua_tombol'): ?>
+                                                <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank"
+                                                    class="btn-action btn-danger">File SP</a>
+                                                <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank"
+                                                    class="btn-action btn-warning">File Tagihan</a>
 
-                                                <?php elseif ($rekomendasi['kode'] === 'sp1'): ?>
-                                                    <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank" class="btn-action btn-delete ?>"> 
-                                                        <?= $rekomendasi['label'] ?> 
-                                                    </a>
+                                            <?php elseif ($rekomendasi['kode'] === 'sp1'): ?>
+                                                <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank"
+                                                    class="btn-action btn-delete ?>">
+                                                    <?= $rekomendasi['label'] ?>
+                                                </a>
 
-                                                <?php elseif ($rekomendasi['kode'] === 'tagihan'): ?>
-                                                    <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank" class="btn-action btn-<?= $rekomendasi['color'] ?>"> 
-                                                        <?= $rekomendasi['label'] ?> 
-                                                    </a>
-                                                <?php endif; 
-                                            endwhile;
-                                        endif;
+                                            <?php elseif ($rekomendasi['kode'] === 'tagihan'): ?>
+                                                <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank"
+                                                    class="btn-action btn-<?= $rekomendasi['color'] ?>">
+                                                    <?= $rekomendasi['label'] ?>
+                                                </a>
+                                            <?php endif;
+                                        endwhile;
+                                    endif;
                                     ?>
                                 <?php endif; ?>
                                 <!-- <a href="../config/cetak-sp.php?id=<?= $id_jukir ?>&kode=<?= $rekomendasi['kode'] ?>" target="_blank"
@@ -568,9 +572,11 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                 e.preventDefault();
 
                 const form = this;
-                const nominal = document.querySelector('[name="jumlah"]').value;
-                const termin = document.querySelector('[name="termin"]').value;
-                const tanggal = document.querySelector('[name="tanggal"]').value;
+                const nominal = form.querySelector('[name="jumlah"]').value;
+                const tanggal = form.querySelector('[name="tanggal"]').value;
+                const idKarcis = form.querySelector('[name="id_karcis"]').value;
+                const noSeriAwal = form.querySelector('[name="no_seri_awal"]').value;
+                const noSeriAkhir = form.querySelector('[name="no_seri_akhir"]').value;
                 const tgl_fmt = new Date(tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
                 const rp = 'Rp ' + Number(nominal).toLocaleString('id-ID');
 
@@ -582,13 +588,13 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                         <span style="color:#94a3b8; font-weight:600;">Nominal</span>
                         <span style="font-weight:700; color:#10b981; font-size:16px;">${rp}</span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9;">
-                        <span style="color:#94a3b8; font-weight:600;">Termin</span>
-                        <span style="font-weight:600; color:#1e293b;">Termin ${termin}</span>
-                    </div>
                     <div style="display:flex; justify-content:space-between; padding:8px 0;">
                         <span style="color:#94a3b8; font-weight:600;">Tanggal</span>
                         <span style="font-weight:600; color:#1e293b;">${tgl_fmt}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:8px 0;">
+                        <span style="color:#94a3b8; font-weight:600;">Nomor Seri</span>
+                        <span style="font-weight:600; color:#1e293b;">${idKarcis} - ${noSeriAwal} - ${noSeriAkhir}</span>
                     </div>
                 </div>
                 <p style="margin-top:16px; font-size:13px; color:#64748b;">
