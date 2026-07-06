@@ -85,7 +85,7 @@ include 'api/fetch_jukir.php';
                         <th>No</th>
                         <th>ID Card</th>
                         <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Petugas
-                            Utama (Klik untuk Pembantu)</th>
+                            Utama</th>
                         <th class="hidden md:table-cell">NIK</th>
                         <th class="hidden md:table-cell">No. Telp</th>
                         <th>Lokasi Parkir</th>
