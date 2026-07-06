@@ -17,7 +17,7 @@ $res_jukir = mysqli_query($conn, $query_jukir);
 $d = mysqli_fetch_assoc($res_jukir);
 
 if (!$d) {
-    redirectBack('retribusi-parkir.php', ['status' => 'error', 'msg' => 'Data Jukir tidak ditemukan.']);
+    redirectBack('retribusi-parkir.php', ['status' => 'error', 'msg' => 'Data Petugas Parkir tidak ditemukan.']);
     exit;
 }
 
@@ -67,16 +67,16 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                 <div class="alert-card <?= $rekomendasi['color'] === 'danger' ? 'danger' : 'warning' ?>">
                     <h4 class="alert-card-title"><i class="fas fa-magic"></i> Petugas Parkir Perlu Diproses</h4>
                     <p class="alert-card-desc">
-                        Hubungi admin untuk men-generate <b>Surat Peringatan</b> & <b>Surat Penagihan</b> secara
+                        Silahkan hubungi admin untuk men-generate <b>Surat Peringatan</b> & <b>Surat Penagihan</b> secara
                         otomatis sesuai data bulan ini.
                     </p>
 
-                    <form action="../store/proses_tunggakan.php" method="POST">
+                    <!-- <form action="../store/proses_tunggakan.php" method="POST">
                         <input type="hidden" name="id_jukir" value="<?= $id_jukir ?>">
                         <input type="hidden" name="jenis_surat" value="<?= $rekomendasi['kode'] ?>">
                         <input type="hidden" name="nominal_tunggakan" value="<?= $target - $realisasi ?>">
 
-                        <!-- <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: end;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: end;">
                             <div>
                                 <label class="form-label">Metode Pengiriman</label>
                                 <select name="metode" class="form-select" required>
@@ -87,8 +87,8 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                             <button type="submit" class="btn-submit-modal" style="margin: 0; width: 100%;">
                                 <i class="fas fa-sync-alt"></i> Generate Surat
                             </button>
-                        </div> -->
-                    </form>
+                        </div>
+                    </form> -->
                 </div>
             <?php endif; ?>
 
@@ -226,16 +226,16 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                                         Tanggal</th>
                                     <th
                                         style="padding: 12px 15px; color: #64748b; font-size: 12px; text-transform: uppercase;">
-                                        Termin</th>
+                                        Nomor Seri Karcis</th>
                                     <th
                                         style="padding: 12px 15px; color: #64748b; font-size: 12px; text-transform: uppercase;">
                                         Metode</th>
                                     <th
                                         style="padding: 12px 15px; color: #64748b; font-size: 12px; text-transform: uppercase; text-align: right;">
                                         Nominal</th>
-                                    <th
+                                    <!-- <th
                                         style="padding: 12px 15px; color: #64748b; font-size: 12px; text-transform: uppercase; text-align: center;">
-                                        Aksi</th>
+                                        Aksi</th> -->
                                 </tr>
                             </thead>
                             <tbody id="isiRiwayat">
@@ -328,25 +328,29 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                                 </tbody>
                                 <?php if ($rekomendasi !== null):
                                     $q_log = mysqli_query($conn, "SELECT * FROM log_aksi_jukir WHERE id_jukir = $id_jukir ORDER BY tanggal_aksi DESC");
-                                        if (mysqli_num_rows($q_log) > 0):
-                                            while ($log = mysqli_fetch_assoc($q_log)):
+                                    if (mysqli_num_rows($q_log) > 0):
+                                        while ($log = mysqli_fetch_assoc($q_log)):
                                             ?>
-                                                <?php if ($rekomendasi['kode'] === 'dua_tombol'): ?>
-                                                    <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank" class="btn-action btn-danger">File SP</a>
-                                                    <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank" class="btn-action btn-warning">File Tagihan</a>
+                                            <?php if ($rekomendasi['kode'] === 'dua_tombol'): ?>
+                                                <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank"
+                                                    class="btn-action btn-danger">File SP</a>
+                                                <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank"
+                                                    class="btn-action btn-warning">File Tagihan</a>
 
-                                                <?php elseif ($rekomendasi['kode'] === 'sp1'): ?>
-                                                    <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank" class="btn-action btn-delete ?>"> 
-                                                        <?= $rekomendasi['label'] ?> 
-                                                    </a>
+                                            <?php elseif ($rekomendasi['kode'] === 'sp1'): ?>
+                                                <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank"
+                                                    class="btn-action btn-delete ?>">
+                                                    <?= $rekomendasi['label'] ?>
+                                                </a>
 
-                                                <?php elseif ($rekomendasi['kode'] === 'tagihan'): ?>
-                                                    <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank" class="btn-action btn-<?= $rekomendasi['color'] ?>"> 
-                                                        <?= $rekomendasi['label'] ?> 
-                                                    </a>
-                                                <?php endif; 
-                                            endwhile;
-                                        endif;
+                                            <?php elseif ($rekomendasi['kode'] === 'tagihan'): ?>
+                                                <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank"
+                                                    class="btn-action btn-<?= $rekomendasi['color'] ?>">
+                                                    <?= $rekomendasi['label'] ?>
+                                                </a>
+                                            <?php endif;
+                                        endwhile;
+                                    endif;
                                     ?>
                                 <?php endif; ?>
                                 <!-- <a href="../config/cetak-sp.php?id=<?= $id_jukir ?>&kode=<?= $rekomendasi['kode'] ?>" target="_blank"
@@ -396,10 +400,25 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Jenis Lokasi</label>
-                            <input type="text" class="form-input"
-                                value="<?= htmlspecialchars($d['titik_parkir'] ?? '-') ?>" readonly
-                                style="background:#f8fafc; color:#64748b;">
+                            <label>Jenis Lokasi</label>
+                            <select name="titik_parkir" id="filter-titik" class="form-control">
+                                <option value="">Semua Titik</option>
+                                <option value="TJU" <?= $d['titik_parkir'] === 'TJU' ? 'selected' : '' ?>>TJU</option>
+                                <option value="TKP" <?= $d['titik_parkir'] === 'TKP' ? 'selected' : '' ?>>TKP</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Jumlah Karcis (Per Lembar)</label>
+                            <input type="number" name="jumlah_karcis" id="edit_jumlah_karcis" class="form-input"
+                                placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Bundel Karcis (Per Bendel)</label>
+                            <input type="number" name="bundel_karcis" id="edit_bundel_karcis" class="form-input"
+                                placeholder="0">
                         </div>
                     </div>
 
@@ -409,14 +428,6 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                             <input type="text" name="id_karcis" id="edit_id_karcis" class="form-input"
                                 placeholder="KRC-001">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Jumlah Karcis</label>
-                            <input type="number" name="jumlah_karcis" id="edit_jumlah_karcis" class="form-input"
-                                placeholder="0">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">No. Seri Awal</label>
                             <input type="text" name="no_seri_awal" id="edit_no_seri_awal" class="form-input"
@@ -485,17 +496,21 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                 <!-- Baris 3: ID Karcis + Jumlah Karcis -->
                 <div class="form-row">
                     <div class="form-group">
-                        <label>ID Karcis</label>
-                        <input type="text" name="id_karcis" placeholder="Contoh: KRC-001">
+                        <label>Bundel Karcis (Per bendel)</label>
+                        <input type="number" name="bundel_karcis" placeholder="0">
                     </div>
                     <div class="form-group">
-                        <label>Jumlah Karcis</label>
+                        <label>Jumlah Karcis (Per lembar)</label>
                         <input type="number" name="jumlah_karcis" placeholder="0">
                     </div>
                 </div>
 
                 <!-- Baris 4: Nomor Seri -->
                 <div class="form-row">
+                    <div class="form-group">
+                        <label>ID Karcis</label>
+                        <input type="text" name="id_karcis" placeholder="Contoh: KRC-001">
+                    </div>
                     <div class="form-group">
                         <label>No. Seri Awal</label>
                         <input type="text" name="no_seri_awal" placeholder="Contoh: 000001">
@@ -623,6 +638,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
             document.getElementById('edit_jenis_kendaraan').value = btn.getAttribute('data-jenis-kendaraan') || '';
             document.getElementById('edit_id_karcis').value = btn.getAttribute('data-id-karcis') || '';
             document.getElementById('edit_jumlah_karcis').value = btn.getAttribute('data-jumlah-karcis') || '';
+            document.getElementById('edit_bundel_karcis').value = btn.getAttribute('data-bundel-karcis') || '';
             document.getElementById('edit_no_seri_awal').value = btn.getAttribute('data-no-seri-awal') || '';
             document.getElementById('edit_no_seri_akhir').value = btn.getAttribute('data-no-seri-akhir') || '';
             document.getElementById('modalEdit').style.display = 'flex';
@@ -651,16 +667,16 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                     html: `
                 <div style="text-align:left; font-size:14px; color:#334155; line-height:2;">
                     <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9;">
-                        <span style="color:#94a3b8; font-weight:600;">Nominal Baru</span>
+                        <span style="color:#94a3b8; font-weight:600;">Nominal</span>
                         <span style="font-weight:700; color:#10b981; font-size:16px;">${rp}</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9;">
-                        <span style="color:#94a3b8; font-weight:600;">Termin</span>
-                        <span style="font-weight:600; color:#1e293b;">Termin ${termin}</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; padding:8px 0;">
                         <span style="color:#94a3b8; font-weight:600;">Tanggal</span>
                         <span style="font-weight:600; color:#1e293b;">${tgl_fmt}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:8px 0;">
+                        <span style="color:#94a3b8; font-weight:600;">Nomor Seri</span>
+                        <span style="font-weight:600; color:#1e293b;">${idKarcis} - ${noSeriAwal} - ${noSeriAkhir}</span>
                     </div>
                 </div>
                 <p style="margin-top:16px; font-size:13px; color:#64748b;">

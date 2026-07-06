@@ -140,12 +140,15 @@ function filterSetoran($conn)
                 $tgl = date('d M Y', strtotime($h['tanggal_setoran']));
                 $nominal = number_format($h['jumlah_setoran'], 0, ',', '.');
                 $metode = strtoupper($h['metode_pembayaran'] ?? 'TUNAI');
+                $idKarcis = strtoupper($h['id_karcis']);
+                $noSeriAwal = ($h['no_seri_awal']);
+                $noSeriAkhir = ($h['no_seri_akhir']);
                 echo "
             <tr>
                 <td data-label='Tanggal' style='padding:14px 20px; font-weight:500; color:#334155; font-size:14px;'>$tgl</td>
-                <td data-label='Termin' style='padding:14px 20px;'>
+                <td data-label='Nomor Seri Karcis' style='padding:14px 20px;'>
                     <span style='background:#f1f5f9; padding:4px 12px; border-radius:999px; font-size:12px; color:#475569; font-weight:600;'>
-                        Termin {$h['termin']}
+                        {$idKarcis} - {$noSeriAwal} - {$noSeriAkhir}
                     </span>
                 </td>
                 <td data-label='Metode' style='padding:14px 20px;'>
