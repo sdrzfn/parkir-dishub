@@ -39,6 +39,8 @@ $result = mysqli_query($conn, $sql);
                         <th>No</th>
                         <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Wilayah</th>
                         <th>Nama Koordinator</th>
+                        <th>NIP</th>
+                        <th>Jabatan</th>
                         <th>No. Telepon</th>
                         <th>Email</th>
                         <th style="text-align: center;">Aksi</th>
@@ -60,6 +62,8 @@ $result = mysqli_query($conn, $sql);
                                         <?= $row['nama_korwil']; ?>
                                     </div>
                                 </td>
+                                <td data-label="NIP"><?= htmlspecialchars($row['nip'] ?? '-'); ?></td>
+                                <td data-label="Jabatan"><?= htmlspecialchars($row['jabatan'] ?? '-'); ?></td>
                                 <td data-label="Email"><?= htmlspecialchars($row['email'] ?? '-'); ?></td>
                                 <td data-label="Aksi" style="text-align: center;"></td>
                                 <td data-label="Aksi" style="text-align: center;">
@@ -126,6 +130,16 @@ $result = mysqli_query($conn, $sql);
                     </div>
 
                     <div style="margin-bottom: 15px;">
+                        <label class="form-label">NIP</label>
+                        <input type="text" name="nip" id="nip" class="form-input" placeholder="Masukkan nip">
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label class="form-label">Jabatan</label>
+                        <input type="text" name="jabatan" id="jabatan" class="form-input" placeholder="Masukkan jabatan">
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
                         <label class="form-label">No. Telepon</label>
                         <input type="text" name="no_telp" id="no_telp" class="form-input" placeholder="08xxxx">
                     </div>
@@ -167,6 +181,8 @@ $result = mysqli_query($conn, $sql);
             document.getElementById('nama_korwil').value = data.nama_korwil;
             document.getElementById('no_telp').value = data.no_telp || '';
             document.getElementById('email').value = data.email || '';
+            document.getElementById('nip').value = data.nip || '';
+            document.getElementById('jabatan').value = data.jabatan || '';
 
             modal.style.display = 'flex';
         }

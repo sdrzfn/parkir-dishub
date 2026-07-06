@@ -36,6 +36,8 @@ $result = mysqli_query($conn, $sql);
                                 <th>No</th>
                                 <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Wilayah</th>
                                 <th>Nama Koordinator</th>
+                                <th>NIP</th>
+                                <th>Jabatan</th>
                                 <th>No. Telepon</th>
                                 <th>Email</th>
                                 <th style="text-align: center;">Aksi</th>
@@ -55,6 +57,8 @@ $result = mysqli_query($conn, $sql);
                                                 <?= $row['nama_korwil']; ?>
                                             </div>
                                         </td>
+                                        <td data-label="NIP"><?= htmlspecialchars($row['nip'] ?? '-'); ?></td>
+                                        <td data-label="Jabatan"><?= htmlspecialchars($row['jabatan'] ?? '-'); ?></td>
                                         <td data-label="No. Telepon"><?= htmlspecialchars($row['no_telp'] ?? '-'); ?></td>
                                         <td data-label="Email"><?= htmlspecialchars($row['email'] ?? '-'); ?></td>
                                         <td data-label="Aksi" style="text-align: center;">
@@ -81,7 +85,7 @@ $result = mysqli_query($conn, $sql);
                             else: 
                             ?>
                                 <tr>
-                                    <td colspan="6">
+                                    <td colspan="8">
                                         <div class="empty-state">
                                             <div class="empty-state-icon"><i class="fas fa-users"></i></div>
                                             <p class="empty-state-title">Belum ada Koordinator Wilayah</p>
@@ -114,6 +118,16 @@ $result = mysqli_query($conn, $sql);
                     <div style="margin-bottom: 15px;">
                         <label class="form-label">Nama Koordinator</label>
                         <input type="text" name="nama_korwil" id="nama_korwil" class="form-input" required placeholder="Masukkan nama lengkap">
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label class="form-label">NIP</label>
+                        <input type="text" name="nip" id="nip" class="form-input" required placeholder="Masukkan nip korwil">
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label class="form-label">Jabatan</label>
+                        <input type="text" name="jabatan" id="jabatan" class="form-input" required placeholder="Masukkan jabatan korwil">
                     </div>
 
                     <div style="margin-bottom: 15px;">
@@ -158,6 +172,8 @@ $result = mysqli_query($conn, $sql);
             document.getElementById('nama_korwil').value = data.nama_korwil;
             document.getElementById('no_telp').value = data.no_telp || '';
             document.getElementById('email').value = data.email || '';
+            document.getElementById('nip').value = data.nip || '';
+            document.getElementById('jabatan').value = data.jabatan || '';
             
             modal.style.display = 'flex';
         }

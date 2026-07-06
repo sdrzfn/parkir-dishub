@@ -14,6 +14,8 @@ if ($action === 'add' || $action === 'edit') {
     $nama_korwil= mysqli_real_escape_string($conn, trim($_POST['nama_korwil'] ?? ''));
     $no_telp    = mysqli_real_escape_string($conn, trim($_POST['no_telp']   ?? ''));
     $email      = mysqli_real_escape_string($conn, trim($_POST['email']     ?? ''));
+    $nip        = mysqli_real_escape_string($conn, trim($_POST['nip']       ?? ''));
+    $jabatan    = mysqli_real_escape_string($conn, trim($_POST['jabatan']   ?? ''));
 
     if (empty($wilayah) || empty($nama_korwil)) {
         redirectBack('koordinator-wilayah.php', ['status' => 'error', 'msg' => 'Wilayah dan Nama Koordinator wajib diisi.']);
@@ -21,12 +23,12 @@ if ($action === 'add' || $action === 'edit') {
     }
 
     if ($action === 'add') {
-        $sql = "INSERT INTO koordinator_wilayah (wilayah, nama_korwil, no_telp, email)
-                VALUES ('$wilayah', '$nama_korwil', '$no_telp', '$email')";
+        $sql = "INSERT INTO koordinator_wilayah (wilayah, nama_korwil, nip, jabatan, no_telp, email)
+                VALUES ('$wilayah', '$nama_korwil', '$nip', '$jabatan', '$no_telp', '$email')";
         $status = 'success_add';
     } else {
         $sql = "UPDATE koordinator_wilayah
-                SET wilayah='$wilayah', nama_korwil='$nama_korwil', no_telp='$no_telp', email='$email'
+                SET wilayah='$wilayah', nama_korwil='$nama_korwil', nip='$nip', jabatan='$jabatan', no_telp='$no_telp', email='$email'
                 WHERE id=$id";
         $status = 'success_edit';
     }
