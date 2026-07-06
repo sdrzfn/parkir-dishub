@@ -6,3 +6,4 @@ fontawesome/
 .env
 /data-cleaning/
 /notes/
+/*.sql
