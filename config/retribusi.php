@@ -168,6 +168,12 @@ function filterSetoran($conn)
                             data-termin='{$h['termin']}'
                             data-metode='{$h['metode_pembayaran']}'
                             data-nominal='{$h['jumlah_setoran']}'
+                            data-jenis-kendaraan='{$h['jenis_kendaraan']}'
+                            data-no-seri-awal='{$h['no_seri_awal']}'
+                            data-no-seri-akhir='{$h['no_seri_akhir']}'
+                            data-id-karcis='{$h['id_karcis']}'
+                            data-jumlah-karcis='{$h['jumlah_karcis']}'
+                            data-bundel-karcis='{$h['bundel_karcis']}'
                             onclick='openEditModal(this)'>
                             <i class='fas fa-pencil-alt' style='font-size:11px;'></i> Edit
                         </button>
