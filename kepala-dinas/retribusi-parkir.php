@@ -353,7 +353,7 @@ $tables_config = [
                     <div style="display: flex; gap: 15px;">
                         <div class="form-group" style="flex: 1;">
                             <label>No. Telp</label>
-                            <input type="text" name="no_telp" id="form_telp" class="form-control">
+                            <input type="text" name="no_telp" id="form_telp" class="form-control" required>
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label>Lokasi Penugasan</label>

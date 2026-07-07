@@ -392,7 +392,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Jenis Kendaraan</label>
-                            <select name="jenis_kendaraan" id="edit_jenis_kendaraan" class="form-select">
+                            <select name="jenis_kendaraan" id="edit_jenis_kendaraan" class="form-select" required>
                                 <option value="">Pilih Jenis</option>
                                 <option value="R2">R2 — Roda 2</option>
                                 <option value="R4">R4 — Roda 4</option>
@@ -401,7 +401,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                         </div>
                         <div class="form-group">
                             <label>Jenis Lokasi</label>
-                            <select name="titik_parkir" id="filter-titik" class="form-control">
+                            <select name="titik_parkir" id="filter-titik" class="form-control" required>
                                 <option value="">Semua Titik</option>
                                 <option value="TJU" <?= $d['titik_parkir'] === 'TJU' ? 'selected' : '' ?>>TJU</option>
                                 <option value="TKP" <?= $d['titik_parkir'] === 'TKP' ? 'selected' : '' ?>>TKP</option>
@@ -409,15 +409,15 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                         </div>
                     </div>
 
-                    <div class="form-row">
+                    <div class="form-row">                        
                         <div class="form-group">
                             <label class="form-label">Jumlah Karcis (Per Lembar)</label>
-                            <input type="number" name="jumlah_karcis" id="edit_jumlah_karcis" class="form-input"
+                            <input type="number" name="jumlah_karcis" id="edit_jumlah_karcis" class="form-input" required
                                 placeholder="0">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Bundel Karcis (Per Bendel)</label>
-                            <input type="number" name="bundel_karcis" id="edit_bundel_karcis" class="form-input"
+                            <input type="number" name="bundel_karcis" id="edit_bundel_karcis" class="form-input" required
                                 placeholder="0">
                         </div>
                     </div>
@@ -425,17 +425,17 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">ID Karcis</label>
-                            <input type="text" name="id_karcis" id="edit_id_karcis" class="form-input"
+                            <input type="text" name="id_karcis" id="edit_id_karcis" class="form-input" required
                                 placeholder="KRC-001">
                         </div>
                         <div class="form-group">
                             <label class="form-label">No. Seri Awal</label>
-                            <input type="text" name="no_seri_awal" id="edit_no_seri_awal" class="form-input"
+                            <input type="text" name="no_seri_awal" id="edit_no_seri_awal" class="form-input" required
                                 placeholder="000001">
                         </div>
                         <div class="form-group">
                             <label class="form-label">No. Seri Akhir</label>
-                            <input type="text" name="no_seri_akhir" id="edit_no_seri_akhir" class="form-input"
+                            <input type="text" name="no_seri_akhir" id="edit_no_seri_akhir" class="form-input" required
                                 placeholder="000050">
                         </div>
                     </div>
