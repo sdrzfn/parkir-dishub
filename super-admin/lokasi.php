@@ -143,7 +143,7 @@ include '../api/fetch_lokasi.php';
                                 <td data-label="Target Bulanan" class="text-nominal hidden md:table-cell">
                                     Rp <?= number_format($row['target_bulanan'], 0, ',', '.') ?>
                                 </td>
-                                <td data-label="Target Bulanan" class="text-nominal hidden md:table-cell">
+                                <td data-label="Target Harian" class="text-nominal hidden md:table-cell">
                                     Rp <?= number_format($row['target_harian'], 0, ',', '.') ?>
                                 </td>
                                 <td data-label="Aksi" style="text-align:center;">
