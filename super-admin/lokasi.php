@@ -53,23 +53,24 @@ include '../api/fetch_lokasi.php';
                             <option value="">Semua Kecamatan</option>
                             <?php
                             $list_kecamatan = [
-                                'Balongbendo',
-                                'Taman',
-                                'Buduran',
-                                'Porong',
-                                'Tanggulangin',
-                                'Candi',
-                                'Prambon',
-                                'Tarik',
-                                'Gedangan',
-                                'Sedati',
-                                'Tulangan',
-                                'Jabon',
-                                'Sidoarjo',
-                                'Waru',
-                                'Krembung',
-                                'Sukodono',
-                                'Wonoayu'
+                                "Balongbendo",
+                                "Buduran",
+                                "Candi",
+                                "Gedangan",
+                                "Jabon",
+                                "Krembung",
+                                "Krian",
+                                "Porong",
+                                "Prambon",
+                                "Sedati",
+                                "Sidoarjo",
+                                "Sukodono",
+                                "Taman",
+                                "Tanggulangin",
+                                "Tarik",
+                                "Tulangan",
+                                "Waru",
+                                "Wonoayu"
                             ];
                             foreach ($list_kecamatan as $kec):
                                 $selected = ($kecamatan === $kec) ? 'selected' : '';

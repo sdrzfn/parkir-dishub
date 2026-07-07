@@ -88,30 +88,32 @@ $tables_config = [
                 <div class="filter-search-wrapper">
                     <i class="fas fa-search filter-search-icon"></i>
                     <input type="text" name="search" class="filter-search-input"
-                        placeholder="Cari Petugas Parkir, Lokasi, atau QRIS..." value="<?= htmlspecialchars($search ?? '') ?>">
+                        placeholder="Cari Petugas Parkir, Lokasi, atau QRIS..."
+                        value="<?= htmlspecialchars($search ?? '') ?>">
                 </div>
 
                 <select name="kecamatan" class="filter-select" style="max-width: 200px;">
                     <option value="">Semua Kecamatan</option>
                     <?php
                     $list_kecamatan = [
-                        'Balongbendo',
-                        'Taman',
-                        'Buduran',
-                        'Porong',
-                        'Tanggulangin',
-                        'Candi',
-                        'Prambon',
-                        'Tarik',
-                        'Gedangan',
-                        'Sedati',
-                        'Tulangan',
-                        'Jabon',
-                        'Sidoarjo',
-                        'Waru',
-                        'Krembung',
-                        'Sukodono',
-                        'Wonoayu'
+                        "Balongbendo",
+                        "Buduran",
+                        "Candi",
+                        "Gedangan",
+                        "Jabon",
+                        "Krembung",
+                        "Krian",
+                        "Porong",
+                        "Prambon",
+                        "Sedati",
+                        "Sidoarjo",
+                        "Sukodono",
+                        "Taman",
+                        "Tanggulangin",
+                        "Tarik",
+                        "Tulangan",
+                        "Waru",
+                        "Wonoayu"
                     ];
                     foreach ($list_kecamatan as $kec):
                         $selected = ($kecamatan === $kec) ? 'selected' : '';
@@ -143,7 +145,8 @@ $tables_config = [
                         <thead>
                             <tr>
                                 <th style="width: 50px;">No</th>
-                                <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Petugas Parkir
+                                <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Petugas
+                                    Parkir
                                     (Utama/Pembantu)</th>
                                 <th>Lokasi</th>
                                 <th class="hidden md:table-cell">Realisasi</th>
@@ -198,9 +201,11 @@ $tables_config = [
                                             </div>
                                         </td>
                                         <td data-label="Realisasi" class="text-success font-medium hidden md:table-cell">Rp
-                                            <?= number_format($realisasi_dana, 0, ',', '.'); ?></td>
+                                            <?= number_format($realisasi_dana, 0, ',', '.'); ?>
+                                        </td>
                                         <td data-label="Target" class="text-primary hidden md:table-cell">Rp
-                                            <?= number_format($target_dana, 0, ',', '.'); ?></td>
+                                            <?= number_format($target_dana, 0, ',', '.'); ?>
+                                        </td>
                                         <td data-label="Persentase"
                                             class="<?= ($persen >= 100) ? 'text-success' : (($persen >= 65) ? 'text-warning' : 'text-danger'); ?> font-bold">
                                             <?= $persen; ?>%
@@ -265,7 +270,7 @@ $tables_config = [
                                             </div>
                                         </td>
                                     </tr>
-                                <?php
+                                    <?php
                                 endforeach;
                             else:
                                 ?>

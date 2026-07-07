@@ -40,23 +40,24 @@ include '../api/fetch_jukir.php';
                     <option value="">Semua Kecamatan</option>
                     <?php
                     $list_kecamatan = [
-                        'Balongbendo',
-                        'Taman',
-                        'Buduran',
-                        'Porong',
-                        'Tanggulangin',
-                        'Candi',
-                        'Prambon',
-                        'Tarik',
-                        'Gedangan',
-                        'Sedati',
-                        'Tulangan',
-                        'Jabon',
-                        'Sidoarjo',
-                        'Waru',
-                        'Krembung',
-                        'Sukodono',
-                        'Wonoayu'
+                        "Balongbendo",
+                        "Buduran",
+                        "Candi",
+                        "Gedangan",
+                        "Jabon",
+                        "Krembung",
+                        "Krian",
+                        "Porong",
+                        "Prambon",
+                        "Sedati",
+                        "Sidoarjo",
+                        "Sukodono",
+                        "Taman",
+                        "Tanggulangin",
+                        "Tarik",
+                        "Tulangan",
+                        "Waru",
+                        "Wonoayu"
                     ];
                     foreach ($list_kecamatan as $kec):
                         $selected = ($kecamatan === $kec) ? 'selected' : '';
@@ -130,7 +131,8 @@ include '../api/fetch_jukir.php';
                                 </td>
 
                                 <td data-label="NIK" class="py-3 px-6 hidden md:table-cell font-mono text-sm">
-                                    <?= $row['nik']; ?></td>
+                                    <?= $row['nik']; ?>
+                                </td>
                                 <td data-label="No. Telp" class="py-3 px-6 hidden md:table-cell"><?= $row['no_telp']; ?></td>
                                 <td data-label="Lokasi Parkir" class="py-3 px-6">
                                     <span class="font-medium"><?= $row['nama_lokasi']; ?></span>
