@@ -568,7 +568,7 @@ include 'api/fetch_jukir.php';
             document.getElementById('form_lokasi').value = data.id_lokasi;
             document.getElementById('form_rekening_utama').value = data.no_rekening || "";
             if (document.getElementById('lokasi_search')) {
-                document.getElementById('lokasi_search').value = data.kode_qris + " - " + data.nama_lokasi;
+                document.getElementById('lokasi_search').value = data.nama_lokasi;
             }
 
             document.getElementById('modalJukir').style.display = 'flex';
