@@ -112,6 +112,7 @@ include 'api/fetch_lokasi.php';
                         <th class="hidden md:table-cell">Kode QRIS</th>
                         <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Lokasi</th>
                         <th class="col-hide-mobile">Petugas Parkir Utama</th>
+                        <th class="hidden md:table-cell">Jenis Kendaraan</th>
                         <th class="hidden md:table-cell">Target Bulanan</th>
                         <th class="hidden md:table-cell">Target Harian</th>
                         <th style="text-align:center;">Aksi</th>
@@ -139,6 +140,20 @@ include 'api/fetch_lokasi.php';
                                         title="<?= htmlspecialchars($row['nama_jukir'] ?? 'Belum diset') ?>">
                                         <?= $row['nama_jukir'] ?? '<span class="no-data">Belum diset</span>' ?>
                                     </div>
+                                </td>
+                                <td data-label="Jenis Kendaraan" class="hidden md:table-cell">
+                                    <?php
+                                    $kats = json_decode($row['jenis_kendaraan'] ?? '[]', true);
+                                    if (!empty($kats)) {
+                                        foreach ($kats as $k) {
+                                            $badgeColor = $k === 'R2' ? '#dbeafe|#1e40af' : ($k === 'R4' ? '#fef3c7|#92400e' : '#fce7f3|#9d174d');
+                                            list($bg, $text) = explode('|', $badgeColor);
+                                            echo "<span style='background:$bg; color:$text; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:600; margin-right:4px;'>$k</span>";
+                                        }
+                                    } else {
+                                        echo '<span style="color:#94a3b8; font-style:italic;">Semua</span>';
+                                    }
+                                    ?>
                                 </td>
                                 <td data-label="Target Bulanan" class="text-nominal hidden md:table-cell">
                                     Rp <?= number_format($row['target_bulanan'], 0, ',', '.') ?>
@@ -263,6 +278,46 @@ include 'api/fetch_lokasi.php';
                     </div>
 
                     <div class="form-group">
+                        <label>Jenis Kendaraan yang Diampu</label>
+                        <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; align-items: center;">
+                            <label class="jenis-kendaraan-option"
+                                style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; cursor: pointer; background: #fff; transition: all 0.2s; user-select: none;"
+                                onmouseenter="this.style.borderColor='#2563eb'; this.style.background='#f8fafc';"
+                                onmouseleave="if(!this.querySelector('input').checked){this.style.borderColor='#e2e8f0'; this.style.background='#fff';}">
+                                <input type="checkbox" name="jenis_kendaraan[]" value="R2" class="jenis-kendaraan-check"
+                                    style="accent-color: #2563eb; width: 16px; height: 16px; cursor: pointer;"
+                                    onchange="updateKendaraanStyle(this)">
+                                <span style="font-size: 13px; font-weight: 500; color: #334155;">R2 (Roda 2)</span>
+                                <span
+                                    style="font-size: 11px; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 4px;">🛵</span>
+                            </label>
+
+                            <label class="jenis-kendaraan-option"
+                                style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; cursor: pointer; background: #fff; transition: all 0.2s; user-select: none;"
+                                onmouseenter="this.style.borderColor='#2563eb'; this.style.background='#f8fafc';"
+                                onmouseleave="if(!this.querySelector('input').checked){this.style.borderColor='#e2e8f0'; this.style.background='#fff';}">
+                                <input type="checkbox" name="jenis_kendaraan[]" value="R4" class="jenis-kendaraan-check"
+                                    style="accent-color: #2563eb; width: 16px; height: 16px; cursor: pointer;"
+                                    onchange="updateKendaraanStyle(this)">
+                                <span style="font-size: 13px; font-weight: 500; color: #334155;">R4 (Roda 4)</span>
+                                <span
+                                    style="font-size: 11px; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 4px;">🚗</span>
+                            </label>
+
+                            <label class="jenis-kendaraan-option"
+                                style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; cursor: pointer; background: #fff; transition: all 0.2s; user-select: none;"
+                                onmouseenter="this.style.borderColor='#2563eb'; this.style.background='#f8fafc';"
+                                onmouseleave="if(!this.querySelector('input').checked){this.style.borderColor='#e2e8f0'; this.style.background='#fff';}">
+                                <input type="checkbox" name="jenis_kendaraan[]" value="R6" class="jenis-kendaraan-check"
+                                    style="accent-color: #2563eb; width: 16px; height: 16px; cursor: pointer;"
+                                    onchange="updateKendaraanStyle(this)">
+                                <span style="font-size: 13px; font-weight: 500; color: #334155;">R6 (Roda 6+)</span>
+                                <span
+                                    style="font-size: 11px; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 4px;">🚛</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label>Kecamatan Wilayah</label>
                         <select name="kecamatan" id="form_kecamatan" class="form-control" required>
                             <option value="">-- Pilih Kecamatan --</option>
@@ -382,6 +437,14 @@ include 'api/fetch_lokasi.php';
             document.getElementById('form_lng').value = data.longitude || '';
             document.getElementById('form_kecamatan').value = data.kecamatan;
 
+            const jenisKendaraan = data.jenis_kendaraan ? JSON.parse(data.jenis_kendaraan) : [];
+            document.querySelectorAll('input[name="jenis_kendaraan[]"]').forEach(cb => {
+                cb.checked = jenisKendaraan.includes(cb.value);
+            });
+            document.querySelectorAll('.jenis-kendaraan-check').forEach(cb => {
+                updateKendaraanStyle(cb);
+            });
+
             modal.style.display = 'flex';
             initMapPicker(data.latitude, data.longitude);
 
@@ -443,6 +506,21 @@ include 'api/fetch_lokasi.php';
                 window.history.replaceState({}, '', url);
             }
         })();
+
+        function updateKendaraanStyle(checkbox) {
+            const label = checkbox.closest('label');
+            if (checkbox.checked) {
+                label.style.borderColor = '#2563eb';
+                label.style.background = '#eff6ff';
+                label.querySelectorAll('span')[1].style.background = '#dbeafe';
+                label.querySelectorAll('span')[1].style.color = '#1e40af';
+            } else {
+                label.style.borderColor = '#e2e8f0';
+                label.style.background = '#fff';
+                label.querySelectorAll('span')[1].style.background = '#f1f5f9';
+                label.querySelectorAll('span')[1].style.color = '#64748b';
+            }
+        }
     </script>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

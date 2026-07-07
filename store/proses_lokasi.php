@@ -15,6 +15,7 @@ if ($action == 'add' || $action == 'edit') {
     $target_bulanan = (float) $_POST['target_bulanan'];
     $target_harian = (float) $_POST['target_harian'];
     $terbilang_target = mysqli_real_escape_string($conn, $_POST['terbilang_target']);
+    $jenis_kendaraan = !empty($_POST['jenis_kendaraan']) ? json_encode($_POST['jenis_kendaraan']) : json_encode([]);
     $latitude = $_POST['latitude'] !== "" ? "'" . mysqli_real_escape_string($conn, $_POST['latitude']) . "'" : "NULL";
     $longitude = $_POST['longitude'] !== "" ? "'" . mysqli_real_escape_string($conn, $_POST['longitude']) . "'" : "NULL";
 
@@ -41,15 +42,15 @@ if ($action == 'add' || $action == 'edit') {
     }
 
     if ($action == 'add') {
-        $sql = "INSERT INTO lokasi (kode_qris, nama_lokasi, kecamatan, titik_parkir, nominal_retribusi, target_bulanan, target_harian, terbilang_target, foto, latitude, longitude) 
-            VALUES ('$kode_qris', '$nama_lokasi', '$kecamatan', '$titik_parkir', '$nominal_retribusi', '$target_bulanan', '$target_harian', '$terbilang_target', '$nama_file_foto', $latitude, $longitude)";
+        $sql = "INSERT INTO lokasi (kode_qris, nama_lokasi, kecamatan, titik_parkir, nominal_retribusi, target_bulanan, target_harian, terbilang_target, jenis_kendaraan, foto, latitude, longitude) 
+        VALUES ('$kode_qris', '$nama_lokasi', '$kecamatan', '$titik_parkir', '$nominal_retribusi', '$target_bulanan', '$target_harian', '$terbilang_target', '$jenis_kendaraan', '$nama_file_foto', $latitude, $longitude)";
     } else {
         $sql = "UPDATE lokasi SET 
-                kode_qris='$kode_qris', nama_lokasi='$nama_lokasi', kecamatan='$kecamatan', titik_parkir='$titik_parkir', 
-                nominal_retribusi='$nominal_retribusi', target_bulanan='$target_bulanan', target_harian='$target_harian',
-                terbilang_target='$terbilang_target', foto='$nama_file_foto', latitude=$latitude, 
-                longitude=$longitude 
-                WHERE id=$id";
+        kode_qris='$kode_qris', nama_lokasi='$nama_lokasi', kecamatan='$kecamatan', titik_parkir='$titik_parkir', 
+        nominal_retribusi='$nominal_retribusi', target_bulanan='$target_bulanan', target_harian='$target_harian',
+        terbilang_target='$terbilang_target', jenis_kendaraan='$jenis_kendaraan', foto='$nama_file_foto', latitude=$latitude, 
+        longitude=$longitude 
+        WHERE id=$id";
     }
 
     if (mysqli_query($conn, $sql)) {
