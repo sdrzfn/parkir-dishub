@@ -6,6 +6,7 @@ include '../config/helper.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_jukir = mysqli_real_escape_string($conn, $_POST['id_jukir']);
     $jumlah = mysqli_real_escape_string($conn, $_POST['jumlah']);
+    $metode = mysqli_real_escape_string($conn, $_POST['metode_pembayaran']);
     $id_karcis = mysqli_real_escape_string($conn, $_POST['id_karcis'] ?? '');
     $no_seri_awal = mysqli_real_escape_string($conn, $_POST['no_seri_awal'] ?? '');
     $no_seri_akhir = mysqli_real_escape_string($conn, $_POST['no_seri_akhir'] ?? '');
@@ -34,8 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id_setoran = mysqli_real_escape_string($conn, $_POST['id_setoran']);
         $sql = "UPDATE transaksi_retribusi SET
                 jumlah_setoran = '$jumlah', 
-                tanggal_setoran = '$tanggal', 
-                termin = '$termin', 
+                tanggal_setoran = '$tanggal',
                 bulan = '$bulan', 
                 tahun = '$tahun',
                 id_karcis       = '$id_karcis',
@@ -43,7 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 no_seri_akhir   = '$no_seri_akhir',
                 jumlah_karcis   = '$jumlah_karcis',
                 bundel_karcis   = '$bundel_karcis',
-                jenis_kendaraan = '$jenis_kendaraan'
+                jenis_kendaraan = '$jenis_kendaraan',
+                metode_pembayaran = '$metode'
                 WHERE id = '$id_setoran'";
     } else {
         $sql = "INSERT INTO transaksi_retribusi
@@ -51,10 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      bulan, tahun, keterangan,
                      id_karcis, no_seri_awal, no_seri_akhir, jumlah_karcis, bundel_karcis, jenis_kendaraan)
                 VALUES
-                    ('$id_jukir', '$jumlah', '$tanggal', 'tunai',
-                     '$bulan', '$tahun', 'Input Manual Admin',
-                     '$id_karcis', '$no_seri_awal', '$no_seri_akhir',
-                     '$jumlah_karcis', '$jenis_kendaraan')";
+                    ('$id_jukir', '$jumlah', '$tanggal', '$metode',
+                    '$bulan', '$tahun', 'Input Manual Admin',
+                    '$id_karcis', '$no_seri_awal', '$no_seri_akhir',
+                    '$jumlah_karcis', '$bundel_karcis', '$jenis_kendaraan')";
     }
 
     $aksi = isset($_POST['id_setoran']) && !empty($_POST['id_setoran']) ? 'edit' : 'tambah';

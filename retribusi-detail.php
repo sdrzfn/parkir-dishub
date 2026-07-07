@@ -438,6 +438,14 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                             <input type="text" name="no_seri_akhir" id="edit_no_seri_akhir" class="form-input" required
                                 placeholder="000050">
                         </div>
+                        <div class="form-group">
+                            <label>Metode Pembayaran</label>
+                            <select name="metode_pembayaran" id="edit_metode_pembayaran" class="form-control" required>
+                                <option value="">Pilih Metode</option>
+                                <option value="qris">Non-Tunai (QRIS)</option>
+                                <option value="tunai">Tunai</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="modal-footer-edit">
                         <button type="button" class="btn-cancel" onclick="closeEditModal()">Batal</button>
@@ -519,6 +527,14 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                         <label>No. Seri Akhir</label>
                         <input type="text" name="no_seri_akhir" placeholder="Contoh: 000050" required>
                     </div>
+                    <div class="form-group">
+                        <label>Metode Pembayaran</label>
+                        <select name="metode_pembayaran" id="filter-titik" class="form-control" required>
+                            <option value="">Pilih Metode</option>
+                            <option value="qris">Non-Tunai (QRIS)</option>
+                            <option value="tunai">Tunai</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="modal-footer-edit">
@@ -592,6 +608,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                 const idKarcis = form.querySelector('[name="id_karcis"]').value;
                 const noSeriAwal = form.querySelector('[name="no_seri_awal"]').value;
                 const noSeriAkhir = form.querySelector('[name="no_seri_akhir"]').value;
+                const metode = form.querySelector('[name="metode_pembayaran"]').value;
                 const tgl_fmt = new Date(tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
                 const rp = 'Rp ' + Number(nominal).toLocaleString('id-ID');
 
@@ -645,6 +662,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
             document.getElementById('edit_bundel_karcis').value = btn.getAttribute('data-bundel-karcis') || '';
             document.getElementById('edit_no_seri_awal').value = btn.getAttribute('data-no-seri-awal') || '';
             document.getElementById('edit_no_seri_akhir').value = btn.getAttribute('data-no-seri-akhir') || '';
+            document.getElementById('edit_metode_pembayaran').value = btn.getAttribute('data-metode') || '';
             document.getElementById('modalEdit').style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
