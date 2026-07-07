@@ -423,7 +423,7 @@ include 'api/fetch_jukir.php';
                             <small id="info_foto" style="display: none; color: #3498db; margin-top: 5px;"></small>
                         </div>
 
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label>Upload File PKS</label>
                             <input type="file" name="file_pks" class="form-control" accept=".pdf, .doc, .docx, image/*">
                             <small id="info_file" style="display: none; color: #3498db; margin-top: 5px;"></small>
@@ -433,7 +433,7 @@ include 'api/fetch_jukir.php';
                             <label>No. Rekening Bank Jatim</label>
                             <input type="number" name="no_rekening_pembantu" id="form_rekening_pembantu"
                                 class="form-control" placeholder="Contoh: 0123456789">
-                        </div>
+                        </div> -->
 
                         <div class="form-group">
                             <label>NIK Petugas Pembantu</label>
@@ -543,7 +543,7 @@ include 'api/fetch_jukir.php';
             document.getElementById('form_id').value = "";
             document.getElementById('form_id_pembantu').value = "";
             document.getElementById('info_foto').style.display = 'none';
-            document.getElementById('info_file').style.display = 'none';
+            // document.getElementById('info_file').style.display = 'none';
 
             document.getElementById('form-jukir-utama').action = "store/proses_jukir.php?action=add&type=utama";
             document.getElementById('form-jukir-pembantu').action = "store/proses_jukir.php?action=add&type=pembantu";
@@ -587,7 +587,7 @@ include 'api/fetch_jukir.php';
             document.getElementById('form_nik_pembantu').value = data.nik;
             document.getElementById('form_nama_pembantu').value = data.nama_pembantu;
             document.getElementById('form_alamat_pembantu').value = data.alamat_pembantu || "";
-            document.getElementById('form_rekening_pembantu').value = data.no_rekening || "";
+            // document.getElementById('form_rekening_pembantu').value = data.no_rekening || "";
 
             document.getElementById('modalJukir').style.display = 'flex';
         }
