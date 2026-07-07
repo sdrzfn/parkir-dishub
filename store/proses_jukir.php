@@ -52,8 +52,8 @@ if ($action == 'add' || $action == 'edit') {
             }
         }
 
-        $foto_baru = uploadBerkas('foto_id_card_pembantu', '../assets/img/jukir/pembantu', ['jpg', 'jpeg', 'png'], 'FOTO_PBT');
-        $pks_baru = uploadBerkas('file_pks_pembantu', '../assets/docs/pks/pembantu', ['pdf'], 'PKS_PBT');
+        $foto_baru = uploadBerkas('foto_id_card', '../assets/img/jukir/pembantu', ['jpg', 'jpeg', 'png'], 'FOTO_PBT');
+        $pks_baru = uploadBerkas('file_pks', '../assets/docs/pks/pembantu', ['pdf'], 'PKS_PBT');
 
         $final_foto = ($foto_baru !== null) ? $foto_baru : $foto_lama;
         $final_pks = ($pks_baru !== null) ? $pks_baru : $pks_lama;
