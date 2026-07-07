@@ -483,7 +483,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                     </div>
                     <div class="form-group">
                         <label>Jenis Lokasi</label>
-                        <select name="titik_parkir" id="filter-titik" class="form-control">
+                        <select name="titik_parkir" id="filter-titik" class="form-control" required>
                             <option value="">Semua Titik</option>
                             <option value="TJU" <?= $d['titik_parkir'] === 'TJU' ? 'selected' : '' ?>>TJU</option>
                             <option value="TKP" <?= $d['titik_parkir'] === 'TKP' ? 'selected' : '' ?>>TKP</option>
@@ -496,12 +496,12 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                 <!-- Baris 3: ID Karcis + Jumlah Karcis -->
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Bundel Karcis (Per bendel)</label>
-                        <input type="number" name="bundel_karcis" placeholder="0">
+                        <label class="form-label">Bundel Karcis (Per Bendel)</label>
+                        <input type="number" name="bundel_karcis" placeholder="0" required>
                     </div>
                     <div class="form-group">
-                        <label>Jumlah Karcis (Per lembar)</label>
-                        <input type="number" name="jumlah_karcis" placeholder="0">
+                        <label>Jumlah Karcis</label>
+                        <input type="number" name="jumlah_karcis" placeholder="0" required>
                     </div>
                 </div>
 
@@ -509,15 +509,15 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                 <div class="form-row">
                     <div class="form-group">
                         <label>ID Karcis</label>
-                        <input type="text" name="id_karcis" placeholder="Contoh: KRC-001">
+                        <input type="text" name="id_karcis" placeholder="Contoh: KRC-001" required>
                     </div>
                     <div class="form-group">
                         <label>No. Seri Awal</label>
-                        <input type="text" name="no_seri_awal" placeholder="Contoh: 000001">
+                        <input type="text" name="no_seri_awal" placeholder="Contoh: 000001" required>
                     </div>
                     <div class="form-group">
                         <label>No. Seri Akhir</label>
-                        <input type="text" name="no_seri_akhir" placeholder="Contoh: 000050">
+                        <input type="text" name="no_seri_akhir" placeholder="Contoh: 000050" required>
                     </div>
                 </div>
 

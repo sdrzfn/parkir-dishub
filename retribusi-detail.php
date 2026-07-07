@@ -328,25 +328,29 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                                 </tbody>
                                 <?php if ($rekomendasi !== null):
                                     $q_log = mysqli_query($conn, "SELECT * FROM log_aksi_jukir WHERE id_jukir = $id_jukir ORDER BY tanggal_aksi DESC");
-                                        if (mysqli_num_rows($q_log) > 0):
-                                            while ($log = mysqli_fetch_assoc($q_log)):
+                                    if (mysqli_num_rows($q_log) > 0):
+                                        while ($log = mysqli_fetch_assoc($q_log)):
                                             ?>
-                                                <?php if ($rekomendasi['kode'] === 'dua_tombol'): ?>
-                                                    <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank" class="btn-action btn-danger">File SP</a>
-                                                    <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank" class="btn-action btn-warning">File Tagihan</a>
+                                            <?php if ($rekomendasi['kode'] === 'dua_tombol'): ?>
+                                                <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank"
+                                                    class="btn-action btn-danger">File SP</a>
+                                                <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank"
+                                                    class="btn-action btn-warning">File Tagihan</a>
 
-                                                <?php elseif ($rekomendasi['kode'] === 'sp1'): ?>
-                                                    <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank" class="btn-action btn-delete ?>"> 
-                                                        <?= $rekomendasi['label'] ?> 
-                                                    </a>
+                                            <?php elseif ($rekomendasi['kode'] === 'sp1'): ?>
+                                                <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank"
+                                                    class="btn-action btn-delete ?>">
+                                                    <?= $rekomendasi['label'] ?>
+                                                </a>
 
-                                                <?php elseif ($rekomendasi['kode'] === 'tagihan'): ?>
-                                                    <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank" class="btn-action btn-<?= $rekomendasi['color'] ?>"> 
-                                                        <?= $rekomendasi['label'] ?> 
-                                                    </a>
-                                                <?php endif; 
-                                            endwhile;
-                                        endif;
+                                            <?php elseif ($rekomendasi['kode'] === 'tagihan'): ?>
+                                                <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank"
+                                                    class="btn-action btn-<?= $rekomendasi['color'] ?>">
+                                                    <?= $rekomendasi['label'] ?>
+                                                </a>
+                                            <?php endif;
+                                        endwhile;
+                                    endif;
                                     ?>
                                 <?php endif; ?>
                                 <!-- <a href="config/cetak-sp.php?id=<?= $id_jukir ?>&kode=<?= $rekomendasi['kode'] ?>" target="_blank"
@@ -405,16 +409,16 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                         </div>
                     </div>
 
-                    <div class="form-row">                        
+                    <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Jumlah Karcis (Per Lembar)</label>
-                            <input type="number" name="jumlah_karcis" id="edit_jumlah_karcis" class="form-input" required
-                                placeholder="0">
+                            <input type="number" name="jumlah_karcis" id="edit_jumlah_karcis" class="form-input"
+                                required placeholder="0">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Bundel Karcis (Per Bendel)</label>
-                            <input type="number" name="bundel_karcis" id="edit_bundel_karcis" class="form-input" required
-                                placeholder="0">
+                            <input type="number" name="bundel_karcis" id="edit_bundel_karcis" class="form-input"
+                                required placeholder="0">
                         </div>
                     </div>
 
@@ -479,7 +483,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                     </div>
                     <div class="form-group">
                         <label>Jenis Lokasi</label>
-                        <select name="titik_parkir" id="filter-titik" class="form-control">
+                        <select name="titik_parkir" id="filter-titik" class="form-control" required>
                             <option value="">Semua Titik</option>
                             <option value="TJU" <?= $d['titik_parkir'] === 'TJU' ? 'selected' : '' ?>>TJU</option>
                             <option value="TKP" <?= $d['titik_parkir'] === 'TKP' ? 'selected' : '' ?>>TKP</option>
@@ -492,13 +496,12 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                 <!-- Baris 3: ID Karcis + Jumlah Karcis -->
                 <div class="form-row">
                     <div class="form-group">
-                            <label class="form-label">Bundel Karcis (Per Bendel)</label>
-                            <input type="number" name="bundel_karcis"
-                                placeholder="0">
-                        </div>
+                        <label class="form-label">Bundel Karcis (Per Bendel)</label>
+                        <input type="number" name="bundel_karcis" placeholder="0" required>
+                    </div>
                     <div class="form-group">
                         <label>Jumlah Karcis</label>
-                        <input type="number" name="jumlah_karcis" placeholder="0">
+                        <input type="number" name="jumlah_karcis" placeholder="0" required>
                     </div>
                 </div>
 
@@ -506,15 +509,15 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                 <div class="form-row">
                     <div class="form-group">
                         <label>ID Karcis</label>
-                        <input type="text" name="id_karcis" placeholder="Contoh: KRC-001">
+                        <input type="text" name="id_karcis" placeholder="Contoh: KRC-001" required>
                     </div>
                     <div class="form-group">
                         <label>No. Seri Awal</label>
-                        <input type="text" name="no_seri_awal" placeholder="Contoh: 000001">
+                        <input type="text" name="no_seri_awal" placeholder="Contoh: 000001" required>
                     </div>
                     <div class="form-group">
                         <label>No. Seri Akhir</label>
-                        <input type="text" name="no_seri_akhir" placeholder="Contoh: 000050">
+                        <input type="text" name="no_seri_akhir" placeholder="Contoh: 000050" required>
                     </div>
                 </div>
 
@@ -577,6 +580,10 @@ $imbal_jasa = hitungImbalJasa($realisasi);
         document.getElementById('modalSetoran')
             .querySelector('form')
             .addEventListener('submit', function (e) {
+                if (!this.checkValidity()) {
+                    this.reportValidity();
+                    return;
+                }
                 e.preventDefault();
 
                 const form = this;
