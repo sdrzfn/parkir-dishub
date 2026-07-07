@@ -661,7 +661,9 @@ $imbal_jasa = hitungImbalJasa($realisasi);
 
                 const form = this;
                 const nominal = document.getElementById('edit_nominal').value;
-                const termin = document.getElementById('edit_termin').value;
+                const idKarcis = form.querySelector('[name="id_karcis"]').value;
+                const noSeriAwal = form.querySelector('[name="no_seri_awal"]').value;
+                const noSeriAkhir = form.querySelector('[name="no_seri_akhir"]').value;
                 const tanggal = document.getElementById('edit_tanggal').value;
                 const tgl_fmt = new Date(tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
                 const rp = 'Rp ' + Number(nominal).toLocaleString('id-ID');
