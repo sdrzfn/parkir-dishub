@@ -66,6 +66,12 @@ include 'api/fetch_jukir.php';
                     ?>
                 </select>
 
+                <select name="tipe_jukir" class="filter-select" style="width: 150px;">
+                    <option value="">Pilih Petugas</option>
+                    <option value="utama" <?= $tipe_jukir == 'utama' ? 'selected' : '' ?>>Jukir Utama</option>
+                    <option value="pembantu" <?= $tipe_jukir == 'pembantu' ? 'selected' : '' ?>>Jukir Pembantu</option>
+                </select>
+
                 <select name="titik_parkir" class="filter-select" style="max-width: 150px;">
                     <option value="">Semua Titik</option>
                     <option value="TJU" <?= $titik_parkir == 'TJU' ? 'selected' : '' ?>>TJU</option>
@@ -250,6 +256,7 @@ include 'api/fetch_jukir.php';
                     'search' => $search,
                     'kecamatan' => $kecamatan,
                     'titik_parkir' => $titik_parkir,
+                    'tipe_jukir' => $tipe_jukir,
                 ]);
                 ?>
 
