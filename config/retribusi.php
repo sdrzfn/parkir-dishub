@@ -143,12 +143,18 @@ function filterSetoran($conn)
                 $idKarcis = strtoupper($h['id_karcis']);
                 $noSeriAwal = ($h['no_seri_awal']);
                 $noSeriAkhir = ($h['no_seri_akhir']);
+                $kodeQris = strtoupper($h['kode_qris'] ?? '-');
                 echo "
             <tr>
                 <td data-label='Tanggal' style='padding:14px 20px; font-weight:500; color:#334155; font-size:14px;'>$tgl</td>
                 <td data-label='Nomor Seri Karcis' style='padding:14px 20px;'>
                     <span style='background:#f1f5f9; padding:4px 12px; border-radius:999px; font-size:12px; color:#475569; font-weight:600;'>
                         {$idKarcis} - {$noSeriAwal} - {$noSeriAkhir}
+                    </span>
+                </td>
+                <td data-label='Kode QRIS' style='padding:14px 20px;'>
+                    <span style='background:#e0e7ff; padding:4px 12px; border-radius:999px; font-size:12px; color:#4f46e5; font-weight:600;'>
+                        $kodeQris
                     </span>
                 </td>
                 <td data-label='Metode' style='padding:14px 20px;'>
@@ -174,6 +180,7 @@ function filterSetoran($conn)
                             data-id-karcis='{$h['id_karcis']}'
                             data-jumlah-karcis='{$h['jumlah_karcis']}'
                             data-bundel-karcis='{$h['bundel_karcis']}'
+                            data-kode-qris='{$h['kode_qris']}'
                             onclick='openEditModal(this)'>
                             <i class='fas fa-pencil-alt' style='font-size:11px;'></i> Edit
                         </button>
@@ -189,7 +196,7 @@ function filterSetoran($conn)
             </tr>";
             }
         } else {
-            echo "<tr><td colspan='5'>
+            echo "<tr><td colspan='6'>
                 <div class='empty-state'>
                     <div class='empty-state-icon'><i class='fas fa-receipt'></i></div>
                     <p class='empty-state-title'>Belum ada transaksi</p>

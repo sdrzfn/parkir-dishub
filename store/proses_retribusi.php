@@ -7,6 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_jukir = mysqli_real_escape_string($conn, $_POST['id_jukir']);
     $jumlah = mysqli_real_escape_string($conn, $_POST['jumlah']);
     $metode = mysqli_real_escape_string($conn, $_POST['metode_pembayaran']);
+    $kode_qris = mysqli_real_escape_string($conn, $_POST['kode_qris'] ?? '');
     $id_karcis = mysqli_real_escape_string($conn, $_POST['id_karcis'] ?? '');
     $no_seri_awal = mysqli_real_escape_string($conn, $_POST['no_seri_awal'] ?? '');
     $no_seri_akhir = mysqli_real_escape_string($conn, $_POST['no_seri_akhir'] ?? '');
@@ -44,15 +45,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 jumlah_karcis   = '$jumlah_karcis',
                 bundel_karcis   = '$bundel_karcis',
                 jenis_kendaraan = '$jenis_kendaraan',
-                metode_pembayaran = '$metode'
+                metode_pembayaran = '$metode',
+                kode_qris       = '$kode_qris'
                 WHERE id = '$id_setoran'";
     } else {
         $sql = "INSERT INTO transaksi_retribusi
-                    (id_jukir, jumlah_setoran, tanggal_setoran, metode_pembayaran,
+                    (id_jukir, jumlah_setoran, tanggal_setoran, metode_pembayaran, kode_qris,
                      bulan, tahun, keterangan,
                      id_karcis, no_seri_awal, no_seri_akhir, jumlah_karcis, bundel_karcis, jenis_kendaraan)
                 VALUES
-                    ('$id_jukir', '$jumlah', '$tanggal', '$metode',
+                    ('$id_jukir', '$jumlah', '$tanggal', '$metode', '$kode_qris'
                     '$bulan', '$tahun', 'Input Manual Admin',
                     '$id_karcis', '$no_seri_awal', '$no_seri_akhir',
                     '$jumlah_karcis', '$bundel_karcis', '$jenis_kendaraan')";

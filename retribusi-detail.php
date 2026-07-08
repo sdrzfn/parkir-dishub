@@ -137,10 +137,10 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                             <span class="info-label">Nama Lokasi</span>
                             <span class="info-value"><?= $d['nama_lokasi'] ?></span>
                         </div>
-                        <div style="background: #f8fafc; padding: 15px; border-radius: 12px;">
+                        <!-- <div style="background: #f8fafc; padding: 15px; border-radius: 12px;">
                             <span class="info-label">Titik QRIS</span>
                             <span class="info-value" style="color: #2563eb;"><?= $d['kode_qris'] ?></span>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
@@ -227,6 +227,9 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                                     <th
                                         style="padding: 12px 15px; color: #64748b; font-size: 12px; text-transform: uppercase;">
                                         Nomor Seri Karcis</th>
+                                    <th
+                                        style="padding: 12px 15px; color: #64748b; font-size: 12px; text-transform: uppercase;">
+                                        Kode QRIS</th>
                                     <th
                                         style="padding: 12px 15px; color: #64748b; font-size: 12px; text-transform: uppercase;">
                                         Metode</th>
@@ -389,6 +392,12 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label>Kode QRIS</label>
+                        <input type="text" name="kode_qris" id="edit_kode_qris" placeholder="Contoh: TMN-APSRI-SBY"
+                            required>
+                    </div>
+
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Jenis Kendaraan</label>
@@ -478,6 +487,11 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label>Kode QRIS</label>
+                    <input type="text" name="kode_qris" placeholder="Contoh: TMN-APSRI-SBY" required>
+                </div>
+
                 <!-- Baris 2: Jenis Kendaraan + Jenis Lokasi -->
                 <div class="form-row">
                     <div class="form-group">
@@ -563,10 +577,6 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group">
-                        <label>Termin</label>
-                        <input type="number" name="termin" id="edit_termin" placeholder="Contoh: 1" required>
-                    </div>
                     <div class="form-group">
                         <label>Nominal (Rp)</label>
                         <input type="number" name="jumlah" id="edit_nominal" placeholder="0" required>
@@ -656,6 +666,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
             document.getElementById('edit_id_jukir_hidden').value = btn.getAttribute('data-id-jukir') || "<?= $id_jukir ?>";
             document.getElementById('edit_tanggal').value = btn.getAttribute('data-tanggal');
             document.getElementById('edit_nominal').value = btn.getAttribute('data-nominal');
+            document.getElementById('edit_kode_qris').value = btn.getAttribute('data-kode-qris');
             document.getElementById('edit_jenis_kendaraan').value = btn.getAttribute('data-jenis-kendaraan') || '';
             document.getElementById('edit_id_karcis').value = btn.getAttribute('data-id-karcis') || '';
             document.getElementById('edit_jumlah_karcis').value = btn.getAttribute('data-jumlah-karcis') || '';
@@ -755,6 +766,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                     <td style="padding:14px 20px;"><span class="skeleton-cell medium"></span></td>
                     <td style="padding:14px 20px;"><span class="skeleton-cell short"></span></td>
                     <td style="padding:14px 20px;"><span class="skeleton-cell medium"></span></td>
+                    <td style="padding:14px 20px;"><span class="skeleton-cell medium"></span></td>
                     <td style="padding:14px 20px; text-align:right;"><span class="skeleton-cell full"></span></td>
                     <td style="padding:14px 20px; text-align:center;"><span class="skeleton-cell short"></span></td>
                 </tr>`;
@@ -849,6 +861,21 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                 window.history.replaceState({}, '', url);
             }
         })();
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const metodeSelect = document.getElementById("metode_pembayaran"); // Sesuaikan ID select metode pembayaran Anda
+            const qrisWrapper = document.getElementById("qris_field_wrapper");
+
+            if (metodeSelect) {
+                metodeSelect.addEventListener("change", function () {
+                    if (this.value === "QRIS") {
+                        qrisWrapper.style.display = "block";
+                    } else {
+                        qrisWrapper.style.display = "none";
+                    }
+                });
+            }
+        });
     </script>
 </body>
 
