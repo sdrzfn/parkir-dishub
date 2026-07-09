@@ -1,6 +1,7 @@
 <?php
 include '../config/db.php';
 include '../config/helper.php';
+include '../config/auth.php';
 
 $action = $_GET['action'] ?? '';
 $type = $_GET['type'] ?? 'utama';

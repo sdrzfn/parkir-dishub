@@ -3,7 +3,6 @@ include '../config/db.php';
 include '../config/auth.php';
 include '../config/helper.php';
 checkLogin();
-allowRole(['admin']);
 
 $action = $_GET['action'] ?? '';
 
