@@ -43,7 +43,7 @@ $total_pages = ceil($total_row / $limit);
 $sql = "SELECT 
             l.*,
             ju.nama_lengkap  AS nama_jukir,
-            kw.wilayah       AS kecamatan
+            kw.wilayah       AS korwil_wilayah
         $base_join
         $where
         ORDER BY l.id ASC
