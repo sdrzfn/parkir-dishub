@@ -261,6 +261,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                                         <th style="padding: 10px; color: #64748b;">Jenis</th>
                                         <th style="padding: 10px; color: #64748b;">File Dokumen (PDF)</th>
                                         <th style="padding: 10px; color: #64748b;">Admin</th>
+                                        <th style="padding: 10px; color: #64748b;" class="text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -288,7 +289,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                                                 <td data-label="Dokumen" style="padding: 10px;">
                                                     <div style="display: flex; flex-direction: column; gap: 5px;">
                                                         <?php if ($log['file_sp']): ?>
-                                                            <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank"
+                                                            <a href="../uploads/surat/<?= $log['file_sp'] ?>" target="_blank"
                                                                 style="color: #3b82f6; text-decoration: none; display: flex; align-items: center; gap: 5px;">
                                                                 <i class="fas fa-file-pdf"></i> <span style="font-size: 11px;">
                                                                     <?= $log['file_sp'] ?>
@@ -297,7 +298,7 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                                                         <?php endif; ?>
 
                                                         <?php if ($log['file_tagihan']): ?>
-                                                            <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank"
+                                                            <a href="../uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank"
                                                                 style="color: #10b981; text-decoration: none; display: flex; align-items: center; gap: 5px;">
                                                                 <i class="fas fa-file-invoice-dollar"></i> <span
                                                                     style="font-size: 11px;">
@@ -315,13 +316,31 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                                                         <?= $log['keterangan'] ?>
                                                     </small>
                                                 </td>
+                                                <td data-label="Aksi" style="padding: 10px; text-align: center;">
+                                                    <div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">
+                                                        <?php if ($log['file_sp']): ?>
+                                                            <a href="../uploads/surat/<?= $log['file_sp'] ?>" download
+                                                                class="btn-action btn-danger" title="Unduh SP"
+                                                                style="padding: 3px 8px; font-size: 11px;">
+                                                                <i class="fas fa-download"></i> SP
+                                                            </a>
+                                                        <?php endif; ?>
+                                                        <?php if ($log['file_tagihan']): ?>
+                                                            <a href="../uploads/surat/<?= $log['file_tagihan'] ?>" download
+                                                                class="btn-action btn-warning" title="Unduh Tagihan"
+                                                                style="padding: 3px 8px; font-size: 11px;">
+                                                                <i class="fas fa-download"></i> Tagihan
+                                                            </a>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </td>
                                             </tr>
                                             <?php
                                         endwhile;
                                     else:
                                         ?>
                                         <tr>
-                                            <td colspan="4" style="padding: 30px; text-align: center; color: #94a3b8;">
+                                            <td colspan="5" style="padding: 30px; text-align: center; color: #94a3b8;">
                                                 <i class="fas fa-folder-open"
                                                     style="display: block; font-size: 24px; margin-bottom: 10px;"></i>
                                                 Belum ada riwayat dokumen untuk petugas parkir ini.
@@ -329,37 +348,6 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
-                                <?php if ($rekomendasi !== null):
-                                    $q_log = mysqli_query($conn, "SELECT * FROM log_aksi_jukir WHERE id_jukir = $id_jukir ORDER BY tanggal_aksi DESC");
-                                    if (mysqli_num_rows($q_log) > 0):
-                                        while ($log = mysqli_fetch_assoc($q_log)):
-                                            ?>
-                                            <?php if ($rekomendasi['kode'] === 'dua_tombol'): ?>
-                                                <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank"
-                                                    class="btn-action btn-danger">File SP</a>
-                                                <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank"
-                                                    class="btn-action btn-warning">File Tagihan</a>
-
-                                            <?php elseif ($rekomendasi['kode'] === 'sp1'): ?>
-                                                <a href="uploads/surat/<?= $log['file_sp'] ?>" target="_blank"
-                                                    class="btn-action btn-delete ?>">
-                                                    <?= $rekomendasi['label'] ?>
-                                                </a>
-
-                                            <?php elseif ($rekomendasi['kode'] === 'tagihan'): ?>
-                                                <a href="uploads/surat/<?= $log['file_tagihan'] ?>" target="_blank"
-                                                    class="btn-action btn-<?= $rekomendasi['color'] ?>">
-                                                    <?= $rekomendasi['label'] ?>
-                                                </a>
-                                            <?php endif;
-                                        endwhile;
-                                    endif;
-                                    ?>
-                                <?php endif; ?>
-                                <!-- <a href="../config/cetak-sp.php?id=<?= $id_jukir ?>&kode=<?= $rekomendasi['kode'] ?>" target="_blank"
-                                    class="btn-action btn-delete">
-                                    <?= $rekomendasi['label'] ?>
-                                </a> -->
                             </table>
                         </div>
                     </div>
