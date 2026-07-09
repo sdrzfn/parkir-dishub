@@ -7,3 +7,5 @@ fontawesome/
 /data-cleaning/
 /notes/
 /*.sql
+/*.tmp
+/*.zip
