@@ -99,9 +99,9 @@ function hitungTunggakan($realisasi, $target)
 function getRekomendasiAksi($persen, $hari_ini)
 {
     if ($persen < 50 && $hari_ini > 20) {
-        return ['kode' => 'sp1', 'label' => 'Terbitkan SP 1', 'color' => 'danger'];
+        return ['kode' => 'sp1', 'label' => 'Unduh SP', 'color' => 'danger'];
     } elseif ($persen < 80) {
-        return ['kode' => 'tagihan', 'label' => 'Kirim Tagihan', 'color' => 'warning'];
+        return ['kode' => 'tagihan', 'label' => 'Unduh Surat Tagihan', 'color' => 'warning'];
     }
     return null; // Tidak perlu aksi
 }
