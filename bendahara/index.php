@@ -133,16 +133,15 @@ $q_live_feed = mysqli_query($conn, "SELECT
                         <span class="text-[10px] text-[#888] font-semibold uppercase mt-0.5">Titik</span>
                     </div>
                     <div class="w-px h-5 bg-[#e0e0e0] hidden sm:block"></div>
-                    <div class="flex items-center gap-2">
-                        <i class="far fa-user text-[#888] text-[16px]"></i>
-                        <span class="text-[1.25rem] font-bold leading-none tracking-tighter text-slate-800"><?= $counts['total_jukir'] ?></span>
-                        <span class="text-[10px] text-[#888] font-semibold uppercase mt-0.5">Petugas Parkir</span>
-                    </div>
-                    <div class="w-px h-5 bg-[#e0e0e0] hidden sm:block"></div>
-                    <div class="flex items-center gap-2">
+                    <!-- <div class="flex items-center gap-2">
                         <i class="far fa-building text-[#888] text-[16px]"></i>
                         <span class="text-[1.25rem] font-bold leading-none tracking-tighter text-slate-800"><?= $counts['total_korwil'] ?></span>
                         <span class="text-[10px] text-[#888] font-semibold uppercase mt-0.5">Wilayah</span>
+                    </div> -->
+                    <div class="flex items-center gap-2">
+                        <i class="far fa-building text-[#888] text-[16px]"></i>
+                        <span class="text-[1.25rem] font-bold leading-none tracking-tighter text-slate-800">18</span>
+                        <span class="text-[10px] text-[#888] font-semibold uppercase mt-0.5">Kecamatan</span>
                     </div>
                 </div>
             </div>
