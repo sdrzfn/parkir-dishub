@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      bulan, tahun, keterangan,
                      id_karcis, no_seri_awal, no_seri_akhir, jumlah_karcis, bundel_karcis, jenis_kendaraan)
                 VALUES
-                    ('$id_jukir', '$jumlah', '$tanggal', '$metode', '$kode_qris'
+                    ('$id_jukir', '$jumlah', '$tanggal', '$metode', '$kode_qris',
                     '$bulan', '$tahun', 'Input Manual Admin',
                     '$id_karcis', '$no_seri_awal', '$no_seri_akhir',
                     '$jumlah_karcis', '$bundel_karcis', '$jenis_kendaraan')";
