@@ -4,7 +4,6 @@ include '../config/auth.php';
 include '../config/helper.php';
 
 checkLogin();
-allowRole(['admin']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     redirectBack('retribusi-detail.php', ['status' => 'error', 'msg' => 'Metode tidak diizinkan.']);
