@@ -40,7 +40,7 @@ include '../api/fetch_lokasi.php';
                             </svg>
                         </span>
                         <input type="text" name="search" class="filter-search-input"
-                            value="<?= htmlspecialchars($search) ?>" placeholder="Cari kode QRIS atau nama lokasi..."
+                            value="<?= htmlspecialchars($search) ?>" placeholder="Cari nama lokasi..."
                             autocomplete="off">
                     </div>
                     <button type="submit" class="filter-btn-search">Cari</button>
@@ -109,7 +109,7 @@ include '../api/fetch_lokasi.php';
                 <thead>
                     <tr>
                         <th>Foto</th>
-                        <th class="hidden md:table-cell">Kode QRIS</th>
+                        <!-- <th class="hidden md:table-cell">Kode QRIS</th> -->
                         <th class="sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">Nama Lokasi</th>
                         <th class="col-hide-mobile">Petugas Parkir Utama</th>
                         <th class="hidden md:table-cell">Jenis Kendaraan</th>
@@ -126,8 +126,8 @@ include '../api/fetch_lokasi.php';
                                     <?php $foto = !empty($row['foto']) ? '../assets/img/lokasi/' . $row['foto'] : '../assets/img/no-image.jpg'; ?>
                                     <img src="<?= $foto ?>" class="img-thumbnail">
                                 </td>
-                                <td data-label="Kode QRIS" class="hidden md:table-cell"
-                                    style="font-weight:600; font-size:0.82rem;"><?= $row['kode_qris'] ?></td>
+                                <!-- <td data-label="Kode QRIS" class="hidden md:table-cell"
+                                    style="font-weight:600; font-size:0.82rem;"><?= $row['kode_qris'] ?></td> -->
                                 <td data-label="Nama Lokasi"
                                     class="sticky left-0 bg-white z-10 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">
                                     <div class="truncate max-w-[200px]" title="<?= htmlspecialchars($row['nama_lokasi']) ?>">
@@ -236,11 +236,11 @@ include '../api/fetch_lokasi.php';
                     <input type="hidden" name="id" id="id_field">
                     <input type="hidden" name="foto_lama" id="foto_lama_field">
 
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label>Kode QRIS</label>
                         <input type="text" name="kode_qris" id="kode_qris" class="form-control" required
                             placeholder="Contoh: TJU-001">
-                    </div>
+                    </div> -->
 
                     <div class="form-group">
                         <label>Nama Lokasi</label>
@@ -331,17 +331,17 @@ include '../api/fetch_lokasi.php';
                     </div>
 
                     <div style="display: flex; gap: 15px;">
-                        <div class="form-group" style="flex: 1;">
+                        <!-- <div class="form-group" style="flex: 1;">
                             <label>Nominal Retribusi (Rp)</label>
-                            <!-- <input type="number" name="nominal_retribusi" id="nominal_retribusi" class="form-control"
-                                required> -->
+                            <input type="number" name="nominal_retribusi" id="nominal_retribusi" class="form-control"
+                                required>
                             <select name="nominal_retribusi" id="nominal_retribusi" class="form-control">
                                 <option value="2000">Rp2.000,00</option>
                                 <option value="3000">Rp3.000,00</option>
                                 <option value="4000">Rp4.000,00</option>
                                 <option value="5000">Rp5.000,00</option>
                             </select>
-                        </div>
+                        </div> -->
                         <div class="form-group" style="flex: 1;">
                             <label>Target Bulanan (Rp)</label>
                             <input type="number" name="target_bulanan" id="target_bulanan" class="form-control"
@@ -355,7 +355,7 @@ include '../api/fetch_lokasi.php';
 
 
                     <div class="form-group">
-                        <label>Terbilang Target</label>
+                        <label>Terbilang Target (Bulanan)</label>
                         <input type="text" name="terbilang_target" id="terbilang_target" class="form-control"
                             placeholder="Contoh: Satu Juta Rupiah">
                     </div>
@@ -426,7 +426,7 @@ include '../api/fetch_lokasi.php';
             title.innerText = 'Edit Lokasi Parkir';
 
             document.getElementById('id_field').value = data.id;
-            document.getElementById('kode_qris').value = data.kode_qris;
+            // document.getElementById('kode_qris').value = data.kode_qris;
             document.getElementById('nama_lokasi').value = data.nama_lokasi;
             document.getElementById('titik_parkir').value = data.titik_parkir;
             document.getElementById('nominal_retribusi').value = data.nominal_retribusi;
