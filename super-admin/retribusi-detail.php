@@ -122,7 +122,7 @@ $wa_url = "https://wa.me/{$wa_number}?text=" . urlencode($wa_message);
                             </div>
                         </div>
                     </form>
-                    
+
                     <!-- Upload Card (hanya muncul untuk Sistem) -->
                     <div id="upload-card" class="card"
                         style="margin-top: 20px; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; background: white; display: none;">
@@ -411,7 +411,7 @@ $wa_url = "https://wa.me/{$wa_number}?text=" . urlencode($wa_message);
                     <div class="modal-header">
                         <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">Upload Surat Manual</h3>
                     </div>
-                    <form id="formUploadSurat" action="store/upload_surat.php" method="POST"
+                    <form id="formUploadSurat" action="../store/upload_surat.php" method="POST"
                         enctype="multipart/form-data" class="modal-form">
                         <input type="hidden" name="id_jukir" value="<?= $id_jukir ?>">
 
