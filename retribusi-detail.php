@@ -15,6 +15,14 @@ $query_jukir = "SELECT j.*,
                 WHERE j.id = $id_jukir";
 $res_jukir = mysqli_query($conn, $query_jukir);
 $d = mysqli_fetch_assoc($res_jukir);
+function formatWaNumber($phone)
+{
+    $phone = preg_replace('/[^0-9]/', '', $phone);
+    if (substr($phone, 0, 1) === '0') {
+        $phone = '62' . substr($phone, 1);
+    }
+    return $phone;
+}
 
 if (!$d) {
     redirectBack('retribusi-parkir.php', ['status' => 'error', 'msg' => 'Data Petugas tidak ditemukan.']);
@@ -39,6 +47,10 @@ $rekomendasi = getRekomendasiAksi($persen, $hari_ini);
 
 $nilai_denda = hitungDenda($target, $realisasi);
 $imbal_jasa = hitungImbalJasa($realisasi);
+
+$wa_number = formatWaNumber($d['no_telp'] ?? '');
+$wa_message = "Yth. Pak/Bu *{$d['nama_lengkap']}*, kami informasikan bahwa ada tunggakan retribusi parkir sebesar *Rp " . number_format($target - $realisasi, 0, ',', '.') . "* untuk bulan ini. Mohon segera melakukan pelunasan. Terima kasih.";
+$wa_url = "https://wa.me/{$wa_number}?text=" . urlencode($wa_message);
 ?>
 
 <!DOCTYPE html>
@@ -71,24 +83,59 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                         otomatis sesuai data bulan ini.
                     </p>
 
-                    <form action="store/proses_tunggakan.php" method="POST">
+                    <form action="store/proses_tunggakan.php" method="POST" id="formTunggakan">
                         <input type="hidden" name="id_jukir" value="<?= $id_jukir ?>">
                         <input type="hidden" name="jenis_surat" value="<?= $rekomendasi['kode'] ?>">
                         <input type="hidden" name="nominal_tunggakan" value="<?= $target - $realisasi ?>">
+                        <input type="hidden" name="metode" id="metode_input" value="WhatsApp">
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: end;">
                             <div>
                                 <label class="form-label">Metode Pengiriman</label>
-                                <select name="metode" class="form-select" required>
+                                <select id="metode_pengiriman" class="form-select" required>
                                     <option value="WhatsApp">Otomatis via WhatsApp</option>
                                     <option value="Sistem">Simpan ke Riwayat (Fisik)</option>
                                 </select>
                             </div>
-                            <button type="submit" class="btn-submit-modal" style="margin: 0; width: 100%;">
-                                <i class="fas fa-sync-alt"></i> Generate Surat
-                            </button>
+
+                            <!-- WhatsApp Action -->
+                            <div id="whatsapp-action">
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <!-- <button type="submit" class="btn-submit-modal" style="margin: 0; width: 100%;">
+                                        <i class="fas fa-save"></i> Simpan ke Log
+                                    </button> -->
+                                    <a href="<?= $wa_url ?>" target="_blank" rel="noopener noreferrer"
+                                        class="btn-submit-modal"
+                                        style="margin: 0; width: 100%; background: #25d366; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                                        <i class="fab fa-whatsapp"></i> Kirim via WhatsApp
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Sistem Action -->
+                            <div id="sistem-action" style="display: none;">
+                                <button type="button" onclick="openUploadModal()" class="btn-submit-modal"
+                                    style="margin: 0; width: 100%; background: #2563eb;">
+                                    <i class="fas fa-upload"></i> Upload Surat Manual
+                                </button>
+                            </div>
                         </div>
                     </form>
+
+                    <!-- Upload Card (hanya muncul untuk Sistem) -->
+                    <div id="upload-card" class="card"
+                        style="margin-top: 20px; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; background: white; display: none;">
+                        <h4 style="margin: 0 0 10px 0; color: #1e293b;">
+                            <i class="fas fa-upload"></i> Upload Surat Manual
+                        </h4>
+                        <p style="margin: 0 0 15px 0; color: #64748b; font-size: 14px;">
+                            Tempat untuk mengupload dan merekam file Surat Peringatan dan Surat Penagihan yang akan dipakai
+                            dalam proses notifikasi petugas parkir.
+                        </p>
+                        <button onclick="openUploadModal()" class="btn-add-manual" style="margin-top: 15px;">
+                            <i class="fas fa-upload"></i> Upload Surat Manual
+                        </button>
+                    </div>
                 </div>
             <?php endif; ?>
 
@@ -252,7 +299,6 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                         style="margin-top: 20px; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; background: white;">
                         <h4 style="margin: 0 0 15px 0; color: #1e293b;"><i class="fas fa-history"></i> Riwayat Surat
                             Peringatan</h4>
-
                         <div style="overflow-x: auto;">
                             <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                                 <thead>
@@ -271,6 +317,8 @@ $imbal_jasa = hitungImbalJasa($realisasi);
 
                                     if (mysqli_num_rows($q_log) > 0):
                                         while ($log = mysqli_fetch_assoc($q_log)):
+                                            $q_log_latest = mysqli_query($conn, "SELECT file_sp, file_tagihan FROM log_aksi_jukir WHERE id_jukir = $id_jukir ORDER BY tanggal_aksi DESC LIMIT 1");
+                                            $latest_surat = mysqli_fetch_assoc($q_log_latest);
                                             ?>
                                             <tr style="border-bottom: 1px solid #f1f5f9;">
                                                 <td data-label="Tanggal" style="padding: 10px; font-weight: 500;">
@@ -352,6 +400,64 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                         </div>
                     </div>
                 <?php endif; ?>
+            </div>
+            <div id="modalUploadSurat" class="modal-backdrop" style="display: none;">
+                <div class="modal-content">
+                    <button type="button" onclick="closeUploadModal()" class="btn-close-modal" aria-label="Tutup Modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="modal-header">
+                        <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">Upload Surat Manual</h3>
+                    </div>
+                    <form id="formUploadSurat" action="store/upload_surat.php" method="POST"
+                        enctype="multipart/form-data" class="modal-form">
+                        <input type="hidden" name="id_jukir" value="<?= $id_jukir ?>">
+
+                        <div class="form-group">
+                            <label>Jenis Surat</label>
+                            <select name="jenis_surat" class="form-control" required>
+                                <option value="">-- Pilih Jenis --</option>
+                                <option value="tagihan">Surat Tagihan</option>
+                                <option value="sp1">SP 1</option>
+                                <option value="sp2">SP 2</option>
+                                <option value="sp3">SP 3</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>File Surat Peringatan (SP)</label>
+                            <input type="file" name="file_sp" class="form-control" accept=".pdf,.doc,.docx">
+                            <small style="color: #64748b; font-size: 11px;">Format: PDF, DOC, DOCX. Maksimal
+                                5MB.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>File Surat Tagihan</label>
+                            <input type="file" name="file_tagihan" class="form-control" accept=".pdf,.doc,.docx">
+                            <small style="color: #64748b; font-size: 11px;">Format: PDF, DOC, DOCX. Maksimal
+                                5MB.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Keterangan (Opsional)</label>
+                            <textarea name="keterangan" class="form-control" rows="2"
+                                placeholder="Contoh: Upload manual untuk bulan Maret 2026"></textarea>
+                        </div>
+
+                        <div class="modal-footer-edit">
+                            <button type="button" class="btn-cancel" onclick="closeUploadModal()">Batal</button>
+                            <button type="submit" class="btn-save">Upload</button>
+                        </div>
+                    </form>
+                    <div id="uploadPreview"
+                        style="margin-top: 15px; padding: 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; display: none;">
+                        <h5
+                            style="margin: 0 0 10px 0; font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">
+                            <i class="fas fa-eye"></i> Preview File
+                        </h5>
+                        <div id="previewFiles" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                    </div>
+                </div>
             </div>
     </main>
 
@@ -829,6 +935,8 @@ $imbal_jasa = hitungImbalJasa($realisasi);
 
             if (status === 'tambah') {
                 toast.fire({ icon: 'success', title: 'Setoran berhasil ditambahkan!' });
+            } else if (status === 'success_upload') {
+                toast.fire({ icon: 'success', title: 'Surat berhasil diupload!' });
             } else if (status === 'edit') {
                 toast.fire({ icon: 'success', title: 'Data setoran berhasil diperbarui!' });
             } else if (status === 'hapus') {
@@ -862,6 +970,143 @@ $imbal_jasa = hitungImbalJasa($realisasi);
                         qrisWrapper.style.display = "none";
                     }
                 });
+            }
+        });
+
+        // Tampilkan preview saat modal dibuka
+        function openUploadModal() {
+            document.getElementById('modalUploadSurat').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            showPreview(); // Load existing files
+        }
+
+        function closeUploadModal() {
+            document.getElementById('modalUploadSurat').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Data file yang sudah ada di database
+        const existingFiles = {
+            sp: <?= isset($latest_surat['file_sp']) && $latest_surat['file_sp'] ? json_encode($latest_surat['file_sp']) : 'null' ?>,
+            tagihan: <?= isset($latest_surat['file_tagihan']) && $latest_surat['file_tagihan'] ? json_encode($latest_surat['file_tagihan']) : 'null' ?>
+        };
+
+        function getFileIcon(type, ext) {
+            if (type === 'application/pdf' || ext === 'pdf') return 'fa-file-pdf';
+            if (type === 'application/msword' || ext === 'doc') return 'fa-file-word';
+            if (type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || ext === 'docx') return 'fa-file-word';
+            return 'fa-file';
+        }
+
+        function getFileColor(type, ext) {
+            if (type === 'application/pdf' || ext === 'pdf') return '#dc2626';
+            if (type === 'application/msword' || ext === 'doc') return '#2563eb';
+            if (type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || ext === 'docx') return '#2563eb';
+            return '#64748b';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function renderPreviewItem(filename, fileSize, fileType, isExisting = false) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const icon = getFileIcon(fileType, ext);
+            const color = getFileColor(fileType, ext);
+            const size = formatFileSize(fileSize);
+            const label = filename.includes('SP-') ? 'Surat Peringatan' : (filename.includes('TAGIHAN-') ? 'Surat Tagihan' : 'File Surat');
+            const url = isExisting ? `uploads/surat/${filename}` : '#';
+
+            return `
+        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
+            <div style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: ${color}15; color: ${color}; border-radius: 8px; font-size: 18px;">
+                <i class="fas ${icon}"></i>
+            </div>
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-weight: 600; font-size: 13px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${filename}">
+                    ${filename}
+                </div>
+                <div style="font-size: 11px; color: #64748b; margin-top: 2px;">
+                    ${label} • ${size} • ${ext.toUpperCase()}
+                </div>
+            </div>
+            ${isExisting ? `<a href="${url}" download class="btn-action" style="padding: 4px 10px; font-size: 11px; background: #f1f5f9; color: #334155; border-radius: 4px; text-decoration: none;">
+                <i class="fas fa-download"></i>
+            </a>` : ''}
+        </div>
+    `;
+        }
+
+        function showPreview() {
+            const previewContainer = document.getElementById('uploadPreview');
+            const previewFiles = document.getElementById('previewFiles');
+            const fileSp = document.querySelector('input[name="file_sp"]');
+            const fileTagihan = document.querySelector('input[name="file_tagihan"]');
+
+            let html = '';
+
+            // Tampilkan file yang baru dipilih
+            if (fileSp && fileSp.files && fileSp.files[0]) {
+                const file = fileSp.files[0];
+                html += renderPreviewItem(file.name, file.size, file.type, false);
+            }
+
+            if (fileTagihan && fileTagihan.files && fileTagihan.files[0]) {
+                const file = fileTagihan.files[0];
+                html += renderPreviewItem(file.name, file.size, file.type, false);
+            }
+
+            // Tampilkan file yang sudah ada di database (jika tidak ada file baru)
+            if (!html && existingFiles) {
+                if (existingFiles.sp) {
+                    html += renderPreviewItem(existingFiles.sp, 0, 'application/pdf', true);
+                }
+                if (existingFiles.tagihan) {
+                    html += renderPreviewItem(existingFiles.tagihan, 0, 'application/pdf', true);
+                }
+            }
+
+            if (html) {
+                previewFiles.innerHTML = html;
+                previewContainer.style.display = 'block';
+            } else {
+                previewContainer.style.display = 'none';
+            }
+        }
+
+        // Update preview saat file input berubah
+        document.addEventListener('DOMContentLoaded', function () {
+            const fileSpInput = document.querySelector('input[name="file_sp"]');
+            const fileTagihanInput = document.querySelector('input[name="file_tagihan"]');
+
+            if (fileSpInput) {
+                fileSpInput.addEventListener('change', showPreview);
+            }
+            if (fileTagihanInput) {
+                fileTagihanInput.addEventListener('change', showPreview);
+            }
+        });
+
+        document.getElementById('metode_pengiriman').addEventListener('change', function () {
+            const metode = this.value;
+            const whatsappAction = document.getElementById('whatsapp-action');
+            const sistemAction = document.getElementById('sistem-action');
+            const uploadCard = document.getElementById('upload-card');
+
+            if (metode === 'WhatsApp') {
+                whatsappAction.style.display = 'block';
+                sistemAction.style.display = 'none';
+                uploadCard.style.display = 'block';
+                document.getElementById('metode_input').value = 'WhatsApp';
+            } else {
+                whatsappAction.style.display = 'none';
+                sistemAction.style.display = 'block';
+                uploadCard.style.display = 'block';
+                document.getElementById('metode_input').value = 'Sistem';
             }
         });
     </script>
